@@ -43,13 +43,13 @@ export default function UserTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="flex items-center ">
-            <Link href="/users/table">
+            <Link href="user/table">
               <Button variant="ghost" className="ml-4">
                 Expand Table
                 <Expand className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/user/create">
+            <Link href="user/create">
               <Button variant="ghost" className="ml-4">
                 Add User
                 <PlusIcon className="ml-2 h-4 w-4" />
