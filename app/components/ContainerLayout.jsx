@@ -1,3 +1,4 @@
+"use client"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import Link from "next/link"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
@@ -6,8 +7,20 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import Breadcrumbs from "./Breadcrumb"
-
+import { useRouter } from 'next/navigation';
+import {useState} from "react"
 export default function ContainerLayout({children}){
+    const router = useRouter();
+
+    const handleSubmit = (event) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+    
+        // Perform form submission logic here
+    
+        // Redirect to another page
+        router.push('/dashboard/inventory/search');
+      };
+    
     return(
         <div className="flex min-h-screen w-full bg-muted/40">
             <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -19,7 +32,7 @@ export default function ContainerLayout({children}){
                 </Link>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                    <Link href="dashboard" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
+                    <Link href="/dashboard" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
                         <MdiDesktopMacDashboard className="h-5 w-5" />
                         <span className="sr-only">Dashboard</span>
                     </Link>
@@ -46,7 +59,7 @@ export default function ContainerLayout({children}){
                 </Tooltip>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                    <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
+                    <Link href="/dashboard/user" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
                         <MdiAccount className="h-6 w-6" />
                         <span className="sr-only">User</span>
                     </Link>
@@ -118,8 +131,11 @@ export default function ContainerLayout({children}){
 
                 {/* </div> */}
                 <div className="relative ml-auto flex-1 md:grow-0">
-                <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search" placeholder="Search inventory or users ..." className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]" />
+                <form onSubmit={handleSubmit}>
+                    <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input type="search" placeholder="Search inventory or users ..." className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]" />
+                
+                </form>
                 </div>
             
             </header>

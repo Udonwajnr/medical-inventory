@@ -10,21 +10,21 @@ import { Card } from "@/components/ui/card"
 import { Expand } from 'lucide-react';
 import Link from "next/link"
 
-export default function DrugInventoryTable() {
+export default function UserTable() {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("name")
   const [sortDirection, setSortDirection] = useState("asc")
-  const inventory = [
-    { id: 1, name: "Widget A", quantity: 50, price: 9.99, status: "In Stock" },
-    { id: 2, name: "Gadget B", quantity: 12, price: 19.99, status: "Low Stock" },
-    { id: 3, name: "Thingamajig C", quantity: 0, price: 4.99, status: "Out of Stock" },
-    { id: 4, name: "Doodad D", quantity: 100, price: 14.99, status: "In Stock" },
-    { id: 5, name: "Whatchamacallit E", quantity: 25, price: 7.99, status: "In Stock" },
+  const users = [
+    { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
+    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Active" },
+    { id: 3, name: "Michael Johnson", email: "michael@example.com", role: "User", status: "Inactive" },
+    { id: 4, name: "Emily Brown", email: "emily@example.com", role: "Admin", status: "Active" },
+    { id: 5, name: "Chris Evans", email: "chris@example.com", role: "User", status: "Inactive" },
   ]
 
-  const filteredInventory = useMemo(() => {
-    return inventory
-      .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredUsers = useMemo(() => {
+    return users
+      .filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
       .sort((a, b) => {
         if (a[sortBy] < b[sortBy]) return sortDirection === "asc" ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortDirection === "asc" ? 1 : -1
@@ -38,30 +38,30 @@ export default function DrugInventoryTable() {
         <div className="mb-4 flex items-center justify-between ">
           <Input
             className="w-full max-w-xs"
-            placeholder="Search inventory..."
+            placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="flex items-center ">
-            <Link href="inventory/table">
-              <Button  variant="ghost" className="ml-4">
+            <Link href="/users/table">
+              <Button variant="ghost" className="ml-4">
                 Expand Table
                 <Expand className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-              <Link href="inventory/create">
-            <Button variant="ghost" className="ml-4 ">
-                Add Product
+            <Link href="/user/create">
+              <Button variant="ghost" className="ml-4">
+                Add User
                 <PlusIcon className="ml-2 h-4 w-4" />
-            </Button>
-              </Link>
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="relative overflow-auto">
           <Table className="min-w-full text-left">
             <TableHeader className="sticky top-0 bg-white">
               <TableRow>
-                {["name", "quantity", "price"].map((header) => (
+                {["name", "email", "role"].map((header) => (
                   <TableHead
                     key={header}
                     className="cursor-pointer p-4"
@@ -83,18 +83,18 @@ export default function DrugInventoryTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredInventory.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-100">
-                  <TableCell className="p-4 font-medium">{item.name}</TableCell>
-                  <TableCell className="p-4">{item.quantity}</TableCell>
-                  <TableCell className="p-4">${item.price.toFixed(2)}</TableCell>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id} className="hover:bg-gray-100">
+                  <TableCell className="p-4 font-medium">{user.name}</TableCell>
+                  <TableCell className="p-4">{user.email}</TableCell>
+                  <TableCell className="p-4">{user.role}</TableCell>
                   <TableCell className="p-4">
                     <Badge
                       variant={
-                        item.status === "In Stock" ? "secondary" : item.status === "Low Stock" ? "warning" : "danger"
+                        user.status === "Active" ? "secondary" : "danger"
                       }
                     >
-                      {item.status}
+                      {user.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="p-4">
@@ -106,14 +106,13 @@ export default function DrugInventoryTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <Link href="/dashboard/inventory/edit/test">
+                        <Link href={`/users/edit/${user.id}`}>
                           <DropdownMenuItem>
                             Edit
                           </DropdownMenuItem>
                         </Link>
-                        <Link href="/dashboard/inventory/delete/test">
+                        <Link href={`/users/delete/${user.id}`}>
                           <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                        
                         </Link>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -147,7 +146,6 @@ function MoveVerticalIcon(props) {
   )
 }
 
-
 function ExpandIcon(props) {
   return (
     <svg
@@ -169,4 +167,3 @@ function ExpandIcon(props) {
     </svg>
   )
 }
-

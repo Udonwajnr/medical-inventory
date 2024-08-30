@@ -1,9 +1,12 @@
 import React from 'react'
+import ContainerLayout from '../components/ContainerLayout'
 
 export default function DashBoardHome() {
   return (
-    <div>
-        HELLO AND WELCOME TO MY DASHBOARD
-    </div>
+    <ContainerLayout>
+        <div>
+            HELLO AND WELCOME TO MY DASHBOARD
+        </div>
+    </ContainerLayout>
   )
 }
