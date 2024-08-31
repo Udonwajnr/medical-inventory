@@ -106,12 +106,12 @@ export default function UserTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <Link href={`/users/edit/${user.id}`}>
+                        <Link href={`user/edit/${user.id}`}>
                           <DropdownMenuItem>
                             Edit
                           </DropdownMenuItem>
                         </Link>
-                        <Link href={`/users/delete/${user.id}`}>
+                        <Link href={`user/delete/${user.id}`}>
                           <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
                         </Link>
                       </DropdownMenuContent>
