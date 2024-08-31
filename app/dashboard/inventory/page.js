@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from "@/components/ui/card"
 import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
-export default function HospitalDashboard() {
+export default function InventoryDashboard() {
   return (
     <ContainerLayout>
       <>

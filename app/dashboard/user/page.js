@@ -10,113 +10,151 @@ import UserTable from '@/app/components/UserTable'
 export default function UserManagementDashboard() {
   return (
     <ContainerLayout>
-        <div>
+    <div>
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Card>
-        <CardHeader className="pb-3">
-            <CardTitle>Total Users</CardTitle>
-            <CardDescription>
-            <span className="text-4xl font-bold">1,245</span>
-            <span className="text-muted-foreground">Total registered users</span>
-            </CardDescription>
-        </CardHeader>
-        <CardFooter>
-            <Button variant="outline">View Users</Button>
-        </CardFooter>
-        </Card>
-        <Card>
-        <CardHeader className="pb-3">
-            <CardTitle>Active Users</CardTitle>
-            <CardDescription>
-            <span className="text-4xl font-bold">876</span>
-            <span className="text-muted-foreground">Users active in the last 7 days</span>
-            </CardDescription>
-        </CardHeader>
-        <CardFooter>
-            <Button variant="outline">View Activity</Button>
-        </CardFooter>
-        </Card>
-        <Card>
-        <CardHeader className="pb-3">
-            <CardTitle>Pending Approvals</CardTitle>
-            <CardDescription>
-            <span className="text-4xl font-bold">16</span>
-            <span className="text-muted-foreground">Users awaiting approval</span>
-            </CardDescription>
-        </CardHeader>
-        <CardFooter>
-            <Button variant="outline">Review Approvals</Button>
-        </CardFooter>
-        </Card>
-        <Card>
-        <CardHeader className="pb-3">
-            <CardTitle>Admins</CardTitle>
-            <CardDescription>
-            <span className="text-4xl font-bold">5</span>
-            <span className="text-muted-foreground">Total admin users</span>
-            </CardDescription>
-        </CardHeader>
-        <CardFooter>
-            <Button variant="outline">Manage Admins</Button>
-        </CardFooter>
-        </Card>
-    </div>
+            {/* Dashboard Summary Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Total Users</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">1,245</span>
+                            <span className="text-muted-foreground">Total registered users</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">View Users</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Active Users</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">876</span>
+                            <span className="text-muted-foreground">Users active in the last 7 days</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">View Activity</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Pending Approvals</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">16</span>
+                            <span className="text-muted-foreground">Users awaiting approval</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">Review Approvals</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Admins</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">5</span>
+                            <span className="text-muted-foreground">Total admin users</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">Manage Admins</Button>
+                    </CardFooter>
+                </Card>
+                {/* New Cards */}
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Users with Medications</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">320</span>
+                            <span className="text-muted-foreground">Users currently on medication</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">View Users</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Recent Logins</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">150</span>
+                            <span className="text-muted-foreground">Users logged in this week</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">View Logins</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Inactive Users</CardTitle>
+                        <CardDescription>
+                            <span className="text-4xl font-bold">60</span>
+                            <span className="text-muted-foreground">Users inactive for 30+ days</span>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="outline">Reactivate Users</Button>
+                    </CardFooter>
+                </Card>
+            </div>
 
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        <Card>
-        <CardHeader className="pb-3">
-            <CardTitle>Recently Registered Users</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <div className="grid gap-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                <div>
-                    <div className="font-medium">John Doe</div>
-                    <div className="text-sm text-muted-foreground">Registered 2 days ago</div>
-                </div>
-                </div>
-                <Button size="icon" variant="ghost">
-                <ExpandIcon className="h-5 w-5" />
-                </Button>
+            {/* Recently Registered Users and User Table */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Recently Registered Users</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div>
+                                        <div className="font-medium">John Doe</div>
+                                        <div className="text-sm text-muted-foreground">Registered 2 days ago</div>
+                                    </div>
+                                </div>
+                                <Button size="icon" variant="ghost">
+                                    <ExpandIcon className="h-5 w-5" />
+                                </Button>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div>
+                                        <div className="font-medium">Jane Smith</div>
+                                        <div className="text-sm text-muted-foreground">Registered 4 days ago</div>
+                                    </div>
+                                </div>
+                                <Button size="icon" variant="ghost">
+                                    <ExpandIcon className="h-5 w-5" />
+                                </Button>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div>
+                                        <div className="font-medium">Michael Brown</div>
+                                        <div className="text-sm text-muted-foreground">Registered 5 days ago</div>
+                                    </div>
+                                </div>
+                                <Button size="icon" variant="ghost">
+                                    <ExpandIcon className="h-5 w-5" />
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter>
+                        <Button variant="outline">View All Users</Button>
+                    </CardFooter>
+                </Card>
+                {/* User Table Component */}
+                <UserTable />
             </div>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                <div>
-                    <div className="font-medium">Jane Smith</div>
-                    <div className="text-sm text-muted-foreground">Registered 4 days ago</div>
-                </div>
-                </div>
-                <Button size="icon" variant="ghost">
-                <ExpandIcon className="h-5 w-5" />
-                </Button>
-            </div>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                <div>
-                    <div className="font-medium">Michael Brown</div>
-                    <div className="text-sm text-muted-foreground">Registered 5 days ago</div>
-                </div>
-                </div>
-                <Button size="icon" variant="ghost">
-                <ExpandIcon className="h-5 w-5" />
-                </Button>
-            </div>
-            </div>
-        </CardContent>
-        <CardFooter>
-            <Button variant="outline">View All Users</Button>
-        </CardFooter>
-        </Card>
-    
-        {/* User Table Component */}
-        <UserTable />
+        </main>
     </div>
-    </main>
+</ContainerLayout>
 
-        </div>
-    </ContainerLayout>
   )
 }
 
