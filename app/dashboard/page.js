@@ -7,7 +7,6 @@ import { BarChart, Users, Package, DollarSign } from 'lucide-react' // Assuming 
 
 export default function DashBoardHome() {
   return (
-      <ContainerLayout>
         <main className="flex-1 overflow-auto p-6">
           <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -85,6 +84,5 @@ export default function DashBoardHome() {
             </Card>
           </div>
         </main>
-      </ContainerLayout>
   )
 }

@@ -1,6 +1,5 @@
 "use client";
-import { useAuth } from "../auth/auth-context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,8 +14,17 @@ export default function LoginHospital() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated, login, logout, test } = useAuth();
-  const router =useRouter()
+  const router = useRouter();
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      // If a token is found, redirect to the dashboard
+      router.push("/dashboard");
+    }
+  }, [router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -28,11 +36,9 @@ export default function LoginHospital() {
         password,
       });
 
-      console.log(response)
-      login(response.data.token)
-
-      // Save the token (e.g., in localStorage or a state management solution)
+      // Save the token to localStorage
       localStorage.setItem("token", response.data.token);
+
       // Redirect to the dashboard or another page
       router.push("/dashboard");
     } catch (error) {
@@ -41,7 +47,6 @@ export default function LoginHospital() {
       } else {
         setError("An error occurred. Please try again.");
       }
-      console.log(error)
     } finally {
       setLoading(false);
     }

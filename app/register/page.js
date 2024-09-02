@@ -1,14 +1,14 @@
-"use client"
-import { useState,useEffect } from "react"
-import { useRouter } from 'next/navigation'
-import axios from 'axios'
-import Link from "next/link"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import VerifyEmail from "../components/VerifyEmail"
-import { Bars } from 'react-loader-spinner'
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import Link from "next/link";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import VerifyEmail from "../components/VerifyEmail";
+import { Bars } from 'react-loader-spinner';
 
 export default function RegisterHospital() {
   const [formData, setFormData] = useState({
@@ -20,6 +20,15 @@ export default function RegisterHospital() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
+
+  // Check if the user is already registered or authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -64,23 +73,21 @@ export default function RegisterHospital() {
 
     try {
       const response = await axios.post('https://medical-api-advo.onrender.com/api/hospital/register', formData,
-        {headers:"'Content-Type': 'application/json'"}
-      )
-      .then((data)=>{
-        setSuccess(true)
-        console.log(data);
-      })
+        {headers: {'Content-Type': 'application/json'}}
+      );
+
+      // Store the token in localStorage
+      localStorage.setItem("token", response.data.token);
+
+      setSuccess(true);
     } catch (error) {
       setError(error.response?.data?.msg || 'Registration failed. Please try again.');
-      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
   if (success) return <VerifyEmail />;
-  
-
 
   return (
     <div className="flex justify-center items-center h-screen bg-background">
@@ -131,11 +138,10 @@ export default function RegisterHospital() {
                 required
               />
             </div>
-
             <div className="grid gap-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
-                id="confirmPassword" // Ensure the id matches formData key
+                id="confirmPassword"
                 type="password"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}

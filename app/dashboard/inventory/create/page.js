@@ -9,7 +9,6 @@ import ContainerLayout from "@/app/components/ContainerLayout"
 
 export default function CreateProduct() {
   return (
-        <ContainerLayout>
             <main className="flex-1 overflow-auto p-6">
             <div className="grid gap-6">
                 <Card>
@@ -71,6 +70,5 @@ export default function CreateProduct() {
                 </Card>
             </div>
             </main>
-        </ContainerLayout>
   )
 }

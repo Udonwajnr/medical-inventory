@@ -22,8 +22,10 @@ export function AuthProvider({ children }) {
             const token = localStorage.getItem('token');
             if (!token) {
                 setIsAuthenticated(false);
-                router.push('login')
-            } 
+                router.push('/login')
+            } else{
+                router.push('dashboard')
+            }
         };
         checkAuth();
     }, []);
@@ -39,13 +41,15 @@ export function AuthProvider({ children }) {
 
     // Mock logout function
     const logout = () => {
+        console.log(1)
         localStorage.removeItem('token');
-        setIsAuthenticated(false);
+        // setIsAuthenticated(false);
         router.push('/login'); // Redirect to login page
-    };
+      };
+      
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout,  }}>
+        <AuthContext.Provider value={{ isAuthenticated, login,logout  }}>
             {children}
         </AuthContext.Provider>
     );
