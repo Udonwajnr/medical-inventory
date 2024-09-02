@@ -21,9 +21,9 @@ export default function VerifyEmail() {
           </Link>
         </CardContent>
         <CardFooter>
-          <div className="text-center">
+          <div className="text-center  w-full">
             <p className="text-sm text-gray-600">Didn’t receive the email?</p>
-            <Link href="/resend-verification" className="text-blue-500 underline">
+            <Link href="/resend-verification" className="text-blue-500 underline text-center">
               Resend Verification Email
             </Link>
           </div>

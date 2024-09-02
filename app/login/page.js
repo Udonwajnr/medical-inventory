@@ -1,10 +1,52 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+"use client";
+import { useAuth } from "../auth/auth-context";
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { Bars } from "react-loader-spinner"; // Importing the spinner component
 
 export default function LoginHospital() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated, login, logout, test } = useAuth();
+  const router =useRouter()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post("https://medical-api-advo.onrender.com/api/hospital/login", {
+        email,
+        password,
+      });
+
+      console.log(response)
+      login(response.data.token)
+
+      // Save the token (e.g., in localStorage or a state management solution)
+      localStorage.setItem("token", response.data.token);
+      // Redirect to the dashboard or another page
+      router.push("/dashboard");
+    } catch (error) {
+      if (error.response && error.response.data.msg) {
+        setError(error.response.data.msg);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.log(error)
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-screen bg-background">
       <Card className="w-full max-w-md p-6 shadow-lg">
@@ -13,32 +55,55 @@ export default function LoginHospital() {
           <CardDescription>Enter your credentials to access your account.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-sm underline" prefetch={false}>
-                Forgot password?
-              </Link>
+          {error && <p className="text-red-600 text-center">{error}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <Input id="password" type="password" placeholder="Enter your password" />
-          </div>
+            <div className="grid gap-2 mt-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link href="/forgot-password" className="text-sm underline" prefetch={false}>
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              disabled={loading}
+            >
+              {loading ? <Bars color="#ffffff" height={24} width={24} /> : "Login"}
+            </Button>
+          </form>
         </CardContent>
         <CardFooter className="flex-col">
-          <Button className="w-full">Login</Button>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
-                Don't have an account?
-                <Link href="/register" className="text-sm underline">
+              Don't have an account?
+              <Link href="/register" className="text-sm underline">
                 Register
-                </Link>      
+              </Link>      
             </p>
           </div>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

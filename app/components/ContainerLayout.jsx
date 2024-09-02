@@ -3,20 +3,21 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/comp
 import Link from "next/link"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import Breadcrumbs from "./Breadcrumb"
 import { useRouter } from 'next/navigation';
-import {useState} from "react"
 import { usePathname } from 'next/navigation';
+import {useEffect} from "react"
+import { AuthProvider } from "../auth/auth-context"
+import { useAuth } from "../auth/auth-context"
+// import { LogOut } from 'lucide-react';
 
 export default function ContainerLayout({children}){
     const router = useRouter();
     const pathname = usePathname();
-
+    const { isAuthenticated, login, logout, test } = useAuth();
     const isActive = (path) => pathname === path;
-
+;
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
     
@@ -27,6 +28,7 @@ export default function ContainerLayout({children}){
       };
     
     return(
+      <AuthProvider>
         <div className="flex min-h-screen w-full bg-muted/40">
             <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
             <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
@@ -115,6 +117,20 @@ export default function ContainerLayout({children}){
                 </Tooltip>
                 </TooltipProvider>
             </nav>
+
+            <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+                <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                    <Button variant={"outline"} onClick={()=>logout} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
+                        <LogOut className="h-5 w-5" color="" />
+                        <span className="sr-only">Logout</span>
+                    </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Logout</TooltipContent>
+                </Tooltip>
+                </TooltipProvider>
+            </nav>
             </aside>
 
             <div className="flex  flex-col sm:gap-4 sm:w-full sm:py-4 sm:pl-14 bg-background ">
@@ -156,6 +172,10 @@ export default function ContainerLayout({children}){
                         <SettingsIcon className="h-5 w-5" />
                         Settings
                     </Link>
+                    <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                        <LogOut className="h-5 w-5" />
+                        Logout
+                    </Link>
                     </nav>
                 </SheetContent>
                 </Sheet>
@@ -176,6 +196,7 @@ export default function ContainerLayout({children}){
             {children}
             </div>
       </div>
+      </AuthProvider>
     )
 }
 
@@ -388,4 +409,10 @@ function CommandIcon(props) {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="currentColor" d="M21 14V4H3v10h18m0-12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-7l2 3v1H8v-1l2-3H3a2 2 0 0 1-2-2V4c0-1.11.89-2 2-2h18M4 5h11v5H4V5m12 0h4v2h-4V5m4 3v5h-4V8h4M4 11h5v2H4v-2m6 0h5v2h-5v-2Z"></path></svg>
       )
+    }
+
+    function LogOut(){
+    return(
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+    )
     }
