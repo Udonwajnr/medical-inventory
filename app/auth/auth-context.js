@@ -28,10 +28,10 @@ export function AuthProvider({ children }) {
                     const response = await api.get('https://medical-api-advo.onrender.com/api/protected-route');
                     if (response.status === 200) {
                         setIsAuthenticated(true);
-                        console.log(response);
+                        
     
                         // Fetch hospital data if token is valid
-                        const hospitalResponse = await api.get('/api/hospital');
+                        const hospitalResponse = await api.get(`https://medical-api-advo.onrender.com/api/hospital/${response?.data?.hospitalId}`);
                         setHospitalData(hospitalResponse.data);
     
                         // Redirect to the dashboard only if the current route is not the dashboard
@@ -60,8 +60,8 @@ export function AuthProvider({ children }) {
                     router.push('/login');
                 }
             }
+
         };
-    
         checkAuth();
     }, [router]);
     
@@ -94,7 +94,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, hospitalData, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, hospitalData, login, logout,hospitalData }}>
             {children}
         </AuthContext.Provider>
     );

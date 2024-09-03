@@ -37,7 +37,6 @@ api.interceptors.response.use(
                 window.location.href = '/login'; // Redirect to login page
             }
         }
-
         return Promise.reject(error);
     }
 );
