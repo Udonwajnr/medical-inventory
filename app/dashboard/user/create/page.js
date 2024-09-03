@@ -33,7 +33,7 @@ export default function CreateUser() {
   }
 
   return (
-    <ContainerLayout>
+    <>
       <main className="flex-1 overflow-auto p-6">
         <div className="grid gap-6">
           <Card>
@@ -94,6 +94,6 @@ export default function CreateUser() {
           </Card>
         </div>
       </main>
-    </ContainerLayout>
+    </>
   )
 }

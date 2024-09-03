@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
                 setIsAuthenticated(false);
                 router.push('/login')
             } else{
-                router.push('dashboard')
+                router.push('/dashboard')
             }
         };
         checkAuth();

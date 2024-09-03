@@ -44,6 +44,7 @@ export default function LoginHospital() {
     } catch (error) {
       if (error.response && error.response.data.msg) {
         setError(error.response.data.msg);
+        console.log(error)
       } else {
         setError("An error occurred. Please try again.");
       }

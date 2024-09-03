@@ -9,7 +9,7 @@ import UserTable from '@/app/components/UserTable'
 
 export default function UserManagementDashboard() {
   return (
-    <ContainerLayout>
+    <>
     <div>
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             {/* Dashboard Summary Cards */}
@@ -153,7 +153,7 @@ export default function UserManagementDashboard() {
             </div>
         </main>
     </div>
-</ContainerLayout>
+</>
 
   )
 }
