@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import axios from 'axios';
 import { Bars } from 'react-loader-spinner'; // Import the Bars loader
 import ResetEmailSent from "../components/ResetEmailSent";
-
+import { useRouter } from "next/navigation";
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter()
+  
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
@@ -45,6 +47,14 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const data = localStorage.getItem("token");
+    if (data) {
+      // If a token is found, redirect to the dashboard
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   if (success) return <ResetEmailSent />;
 

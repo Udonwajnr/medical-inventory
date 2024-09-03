@@ -37,6 +37,14 @@ export default function EmailVerified() {
     }
   }, [token]);
 
+  useEffect(() => {
+    const data = localStorage.getItem("token");
+    if (data) {
+      // If a token is found, redirect to the dashboard
+      router.push("/dashboard");
+    }
+  }, [router]);
+  
   return (
     <div className="flex justify-center items-center h-screen bg-background">
       <Card className="w-full max-w-md p-6 shadow-lg">

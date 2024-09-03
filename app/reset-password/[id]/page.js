@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import ResetSuccess from "@/app/components/SuccessfulResetPassword";
 import { Bars } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 export default function ResetPassword() {
   const [status, setStatus] = useState("loading"); // 'loading', 'form', 'success', 'expired', 'invalid', 'error'
@@ -17,7 +18,7 @@ export default function ResetPassword() {
   const [error, setError] = useState(null);
   const pathname = usePathname();
   const token = pathname.split('/').pop(); // Extract the token from the URL path
-
+  const router=useRouter()
   useEffect(() => {
     if (token) {
       setStatus("form"); // Display form after token is initially checked
@@ -25,6 +26,15 @@ export default function ResetPassword() {
       setStatus("invalid");
     }
   }, [token]);
+
+  useEffect(() => {
+    const data = localStorage.getItem("token");
+    if (data) {
+      // If a token is found, redirect to the dashboard
+      router.push("/dashboard");
+    }
+  }, [router]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
