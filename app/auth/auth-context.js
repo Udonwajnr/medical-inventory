@@ -1,55 +1,100 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import ContainerLayout from '../components/ContainerLayout';
+import api from '../axios/axiosConfig'; // Use your Axios instance
+
 // Create a Context with default values
 const AuthContext = createContext({
     isAuthenticated: false,
+    hospitalData: null,
     login: () => {},
     logout: () => {},
-    test: { me: "hello" }
 });
 
 // Create a provider component
 export function AuthProvider({ children }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
-    const [test, setTest] = useState({ me: "hello" });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [hospitalData, setHospitalData] = useState(null); // Updated to hold hospital data
     const router = useRouter();
 
     useEffect(() => {
-        // Replace this with your actual authentication check
-        const checkAuth = () => {
+        const checkAuth = async () => {
             const token = localStorage.getItem('token');
-            if (!token) {
+            if (token) {
+                try {
+                    // Set the Authorization header with the token
+                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    // Validate token with a protected route
+                    const response = await api.get('https://medical-api-advo.onrender.com/api/protected-route');
+                    if (response.status === 200) {
+                        setIsAuthenticated(true);
+                        console.log(response);
+    
+                        // Fetch hospital data if token is valid
+                        const hospitalResponse = await api.get('/api/hospital');
+                        setHospitalData(hospitalResponse.data);
+    
+                        // Redirect to the dashboard only if the current route is not the dashboard
+                        if (router.pathname !== '/dashboard') {
+                            router.push('/dashboard');
+                        }
+                    } else {
+                        // Token is not valid, redirect to login
+                        setIsAuthenticated(false);
+                        if (router.pathname !== '/login') {
+                            router.push('/login');
+                        }
+                    }
+                } catch (error) {
+                    // Token verification failed, redirect to login
+                    console.error('Token verification failed:', error);
+                    setIsAuthenticated(false);
+                    if (router.pathname !== '/login') {
+                        router.push('/login');
+                    }
+                }
+            } else {
+                // No token found, redirect to login
                 setIsAuthenticated(false);
-                router.push('/login')
-            } else{
-                router.push('/dashboard')
+                if (router.pathname !== '/login') {
+                    router.push('/login');
+                }
             }
         };
+    
         checkAuth();
-    }, []);
+    }, [router]);
+    
 
-    // Mock login function
-    const login = (token) => {
+    const login = async (token) => {
         localStorage.setItem('token', token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setIsAuthenticated(true);
-        router.push('/dashboard'); // Redirect to home or other page
+        try {
+            // Fetch hospital data after login
+            const hospitalResponse = await api.get('/api/hospital-data');
+            setHospitalData(hospitalResponse.data);
+        } catch (error) {
+            console.error('Failed to fetch hospital data:', error);
+        }
+        router.push('/dashboard');
     };
 
-    // console.log(isAuthenticated)
-
-    // Mock logout function
-    const logout = () => {
-        console.log(1)
+    const logout = async () => {
+        try {
+            // Optionally notify the server about logout here
+            await api.post('/api/auth/logout');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
         localStorage.removeItem('token');
-        // setIsAuthenticated(false);
-        router.push('/login'); // Redirect to login page
-      };
-      
+        setIsAuthenticated(false);
+        setHospitalData(null); // Clear hospital data on logout
+        router.push('/login');
+    };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login,logout  }}>
+        <AuthContext.Provider value={{ isAuthenticated, hospitalData, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

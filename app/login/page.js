@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Bars } from "react-loader-spinner"; // Importing the spinner component
+import api from "../axios/axiosConfig";
 
 export default function LoginHospital() {
   const [email, setEmail] = useState("");
@@ -16,42 +17,44 @@ export default function LoginHospital() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Check if user is already authenticated
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+   // Check if user is already authenticated
+   useEffect(() => {
+    const token = localStorage.getItem('token');
     if (token) {
       // If a token is found, redirect to the dashboard
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
-      const response = await axios.post("https://medical-api-advo.onrender.com/api/hospital/login", {
+      // Use the api instance for the request
+      const response = await api.post('https://medical-api-advo.onrender.com/api/hospital/login', {
         email,
         password,
       });
 
       // Save the token to localStorage
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem('token', response.data.accessToken); // Assuming the response contains accessToken
 
-      // Redirect to the dashboard or another page
-      router.push("/dashboard");
+      // Redirect to the dashboard or another page`
+      router.push('/dashboard');
     } catch (error) {
       if (error.response && error.response.data.msg) {
         setError(error.response.data.msg);
-        console.log(error)
+        console.log(error);
       } else {
-        setError("An error occurred. Please try again.");
+        setError('An error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex justify-center items-center h-screen bg-background">
