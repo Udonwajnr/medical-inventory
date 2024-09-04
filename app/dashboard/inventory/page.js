@@ -53,7 +53,7 @@ export default function InventoryDashboard() {
               <CardHeader className="pb-3">
                 <CardTitle>Low Stock</CardTitle>
                 <CardDescription>
-                  <span className="text-4xl font-bold">{filterLowOnStocks}</span>
+                  <span className="text-4xl font-bold">{filterLowOnStocks || 0}</span>
                   <span className="text-muted-foreground">Items below minimum</span>
                 </CardDescription>
               </CardHeader>
@@ -63,74 +63,46 @@ export default function InventoryDashboard() {
             </Card>
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle>Recent Orders</CardTitle>
+                <CardTitle>Add New Product</CardTitle>
                 <CardDescription>
-                  <span className="text-4xl font-bold">12</span>
-                  <span className="text-muted-foreground">Orders in the last 7 days</span>
+                  <span className="text-4xl font-bold">+</span>
+                  <span className="text-muted-foreground">Add a new product to your inventory</span>
                 </CardDescription>
               </CardHeader>
               <CardFooter>
-                <Button variant="outline">View Orders</Button>
+                <Link  href="/dashboard/inventory/create">
+                  <Button variant="outline">Add Product</Button>
+                </Link>
               </CardFooter>
-            </Card>
+          </Card>
           </div>
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+         
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle>Top Selling Products</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      
-                      <div>
-                        <div className="font-medium">Ibuprofen 200mg</div>
-                        <div className="text-sm text-muted-foreground">Sold 1,234 units</div>
+                  {hospitalData?.medication?.slice(0,5).map((medication)=>{
+                    return(
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          
+                          <div>
+                            <div className="font-medium">{medication.nameOfDrugs}</div>
+                            <div className="text-sm text-muted-foreground">Sold 1,234 units</div>
+                          </div>
+                        </div>
+                        <Link href={`/dashboard/inventory/${medication._id}`}>
+                          <Button size="icon" variant="ghost">
+                            <ExpandIcon className="h-5 w-5" />
+                          </Button>
+                        </Link>
                       </div>
-                    </div>
-                    <Button size="icon" variant="ghost">
-                      <ExpandIcon className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {/* <img
-                        src="/placeholder.svg"
-                        alt="Product Image"
-                        width={48}
-                        height={48}
-                        className="rounded-md"
-                        style={{ aspectRatio: "48/48", objectFit: "cover" }}
-                      /> */}
-                      <div>
-                        <div className="font-medium">Acetaminophen 500mg</div>
-                        <div className="text-sm text-muted-foreground">Sold 987 units</div>
-                      </div>
-                    </div>
-                    <Button size="icon" variant="ghost">
-                      <ExpandIcon className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {/* <img
-                        src="/placeholder.svg"
-                        alt="Product Image"
-                        width={48}
-                        height={48}
-                        className="rounded-md"
-                        style={{ aspectRatio: "48/48", objectFit: "cover" }}
-                      /> */}
-                      <div>
-                        <div className="font-medium">Amoxicillin 500mg</div>
-                        <div className="text-sm text-muted-foreground">Sold 765 units</div>
-                      </div>
-                    </div>
-                    <Button size="icon" variant="ghost">
-                      <ExpandIcon className="h-5 w-5" />
-                    </Button>
-                  </div>
+                    )
+                  })}
                 </div>
               </CardContent>
               <CardFooter>

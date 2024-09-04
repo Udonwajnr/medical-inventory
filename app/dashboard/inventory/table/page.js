@@ -124,7 +124,7 @@ export default function FullInventoryTable() {
                   <TableRow key={medication.id} className="hover:bg-gray-100">
                     <TableCell className="p-4 font-medium">
                       <Link
-                        href={`/dashboard/inventory/product-detail/${medication._id}`}
+                        href={`/dashboard/inventory/${medication._id}`}
                       >
                         {medication.nameOfDrugs}
                       </Link>
@@ -153,13 +153,13 @@ export default function FullInventoryTable() {
                           >
                             <DropdownMenuItem>Edit</DropdownMenuItem>
                           </Link>
-                          <Link href={`/dashboard/inventory/product-detail/${medication._id}`}>
-                            <DropdownMenuItem className="text-red-500">
+                          <Link href={`/dashboard/inventory/${medication._id}`}>
+                            <DropdownMenuItem>
                               Details
                             </DropdownMenuItem>
                           </Link>
                           <Link
-                            href={`/dashboard/inventory/delete/${medication._id}`}
+                            href={`/dashboard/inventory/${medication._id}/delete`}
                           >
                             <DropdownMenuItem className="text-red-500">
                               Delete

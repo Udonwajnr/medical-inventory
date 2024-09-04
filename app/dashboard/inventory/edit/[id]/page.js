@@ -13,7 +13,6 @@ import { Bars } from "react-loader-spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditProductInventory() {
-  const { hospitalData } = useAuth();
   const router = useRouter();
   const { id } = useParams(); // Retrieve the product ID from URL
   const [product, setProduct] = useState(null);

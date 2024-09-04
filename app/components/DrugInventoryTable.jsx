@@ -137,12 +137,12 @@ export default function DrugInventoryTable({ hospitalData }) {
                           <Link href={`/dashboard/inventory/edit/${item._id}`}>
                             <DropdownMenuItem>Edit</DropdownMenuItem>
                           </Link>
-                          <Link href={`/dashboard/inventory/product-detail/${item._id}`}>
+                          <Link href={`/dashboard/inventory/${item._id}`}>
                             <DropdownMenuItem >
                               Details
                             </DropdownMenuItem>
                           </Link>
-                          <Link href={`/dashboard/inventory/delete/${item._id}`}>
+                          <Link href={`/dashboard/inventory/${item._id}/delete`}>
                             <DropdownMenuItem className="text-red-500">
                               Delete
                             </DropdownMenuItem>

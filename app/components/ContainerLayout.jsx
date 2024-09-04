@@ -15,16 +15,12 @@ import { LogOut } from 'lucide-react';
 export default function ContainerLayout({children}){
     const router = useRouter();
     const pathname = usePathname();
-    const { isAuthenticated, login, test,logout,hospitalData } = useAuth();
+    const {logout } = useAuth();
     const isActive = (path) => pathname === path;     
   
 
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-    
-        // Perform form submission logic here
-    
-        // Redirect to another page
         router.push('/dashboard/inventory/search');
       };
     
