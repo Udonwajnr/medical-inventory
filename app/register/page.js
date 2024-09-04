@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import VerifyEmail from "../components/VerifyEmail";
 import { Bars } from 'react-loader-spinner';
-
+import api from "../axios/axiosConfig";
 export default function RegisterHospital() {
   const [formData, setFormData] = useState({
     name: '',
@@ -72,12 +72,7 @@ export default function RegisterHospital() {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://medical-api-advo.onrender.com/api/hospital/register', formData,
-        {headers: {'Content-Type': 'application/json'}}
-      );
-
-      // Store the token in localStorage
-      localStorage.setItem("token", response.data.token);
+      const response = await api.post('https://medical-api-advo.onrender.com/api/hospital/register', formData,);
 
       setSuccess(true);
     } catch (error) {
