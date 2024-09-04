@@ -87,7 +87,7 @@ export default function InventoryDashboard() {
                 <div className="grid gap-4">
                   {hospitalData?.medication?.slice(0,5).map((medication)=>{
                     return(
-                      <div className="flex items-center justify-between">
+                      <div key={hospitalData._id} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           
                           <div>
