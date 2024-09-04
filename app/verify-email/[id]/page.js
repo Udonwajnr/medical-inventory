@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname,useRouter } from "next/navigation";
 import axios from "axios";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,8 @@ export default function EmailVerified() {
   const [status, setStatus] = useState("loading"); // 'loading', 'success', 'expired', 'invalid', 'error'
   const pathname = usePathname();
   const token = pathname.split('/').pop(); // Extract the token from the URL path
-
+  const router = useRouter()
+  
   useEffect(() => {
     if (token) {
       axios.get(`https://medical-api-advo.onrender.com/api/hospital/verify-email/${token}`)
@@ -38,7 +39,7 @@ export default function EmailVerified() {
   }, [token]);
 
   useEffect(() => {
-    const data = localStorage.getItem("token");
+    const data = localStorage.getItem("accessToken");
     if (data) {
       // If a token is found, redirect to the dashboard
       router.push("/dashboard");
