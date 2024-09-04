@@ -16,7 +16,7 @@ export default function InventoryLandingPage() {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-gradient-to-r from-blue-100 via-green-100 to-blue-50">
-        <header className="px-4 lg:px-6 h-14 flex items-center bg-blue-600 text-white shadow-md">
+        <header className=" lg:px-28 h-14 flex items-center bg-blue-600 text-white shadow-md " >
           <Link href="/" className="flex items-center justify-center" prefetch={false}>
             <PillIcon className="h-6 w-6" />
             <span className="ml-2 font-bold">Pharma Inventory</span>
@@ -25,9 +25,9 @@ export default function InventoryLandingPage() {
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
               Home
             </Link>
-            <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            {/* <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
               About
-            </Link>
+            </Link> */}
             <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
               Login
             </Link>
@@ -43,15 +43,15 @@ export default function InventoryLandingPage() {
               <SheetContent>
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>Select a page to navigate</SheetDescription>
+                  {/* <SheetDescription>Select a page to navigate</SheetDescription> */}
                 </SheetHeader>
                 <nav className="flex flex-col gap-4 mt-6">
                   <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
                     Home
                   </Link>
-                  <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
+                  {/* <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
                     About
-                  </Link>
+                  </Link> */}
                   <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
                     Login
                   </Link>
@@ -66,8 +66,8 @@ export default function InventoryLandingPage() {
 
         <main className="flex-1">
           {/* Hero Section */}
-          <section className="w-full py-12 md:py-24 lg:py-32">
-            <div className="flex flex-col md:flex-row items-center justify-around px-4">
+          <section className="w-full  py-10">
+            <div className="flex flex-col md:flex-row items-center justify-around px-4 relative">
               <div className="text-center md:text-left">
                 <h2 className="text-4xl md:text-5xl font-bold leading-tight">
                   Buy, Purchase, and Get <br /> Drugs with Automatic <br />{" "}
@@ -76,39 +76,39 @@ export default function InventoryLandingPage() {
                 <p className="font-bold my-6">
                   PERSONAL INFORMATION // MEDICAL <br /> INFORMATION // PRESCRIPTION VERIFICATION
                 </p>
-                <div className="flex flex-col my-3 gap-2 w-48 mx-auto md:mx-0">
+                {/* <div className="flex flex-col my-3 gap-2 w-48 mx-auto md:mx-0">
                   <Link href="/" className="bg-blue-600 px-4 py-2 text-white rounded-full text-center">
                     Customer View
                   </Link>
                   <Link href="/" className="bg-blue-600 px-4 py-2 text-white rounded-full text-center">
                     Admin View
                   </Link>
-                </div>
+                </div> */}
               </div>
 
-              <div className="relative mt-8 md:mt-0">
-                <img src="img.png" alt="Pharma Inventory" className="w-full max-w-sm mx-auto" />
-                <div className="absolute shadow-xl top-64 -left-16 bg-white rounded-xl px-3 py-3">
-                  <p className="text-center text-sm">The number one service that <br /> renders quick healthcare in Nigeria</p>
+              <div className="relative  md:mt-0">
+                <img src="img.png" alt="Doctor" className="w-full max-w-[950px] mx-auto" />
+                <div className="absolute shadow-xl top-64  lg:-left-16 bg-white rounded-xl px-3 py-3">
+                  <p className="text-center text-[10px] lg:text-lg">The number one service that <br /> renders quick healthcare in Nigeria</p>
                 </div>
-                <div className="absolute top-48 -right-6 bg-white px-3 py-3 rounded-xl shadow-lg">
-                  <p>You don't have to <br /> forget taking <br /> that medication <br /> because we're here <br /> to remind you</p>
+                <div className="absolute top-48 right-8 lg:-right-6 bg-white px-3 py-3 rounded-xl shadow-lg">
+                  <p className="text-center text-[10px] lg:text-lg">You don't have to <br /> forget taking <br /> that medication <br /> because we're here <br /> to remind you</p>
                 </div>
                 <div className="absolute inset-0 w-[80%] h-[70%] bg-blue-300 rounded-xl -z-10 top-12 left-8"></div>
               </div>
             </div>
 
-            <div className="flex justify-between bg-blue-600 text-white py-6 px-4 mt-12">
+            <div className="flex justify-between bg-blue-600 text-white py-6 lg:px-28 mt-12">
               <div className="text-center">
-                <p className="text-4xl">100,000</p>
+                <p className="text-lg lg:text-4xl">100,000</p>
                 <span className="text-sm">Total Users</span>
               </div>
               <div className="text-center">
-                <p className="text-4xl">500</p>
+                <p className="text-lg lg:text-4xl">500</p>
                 <span className="text-sm">Listed Drugs</span>
               </div>
               <div className="text-center">
-                <p className="text-4xl">20%</p>
+                <p className="text-lg lg:text-4xl">20%</p>
                 <span className="text-sm">Sales Increase</span>
               </div>
             </div>
