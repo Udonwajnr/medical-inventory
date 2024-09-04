@@ -1,206 +1,219 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination"
-import ContainerLayout from "@/app/components/ContainerLayout"
-import Link from "next/link"
-export default function InventoryTable() {
-  const [search, setSearch] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const medications = [
-    {
-      id: 1,
-      name: "Amoxicillin",
-      dosage: "500mg",
-      type: "Antibiotic",
-      frequency: "Twice daily",
-      instructions: "Take with food",
-    },
-    {
-      id: 2,
-      name: "Ibuprofen",
-      dosage: "200mg",
-      type: "Anti-inflammatory",
-      frequency: "Every 6 hours as needed",
-      instructions: "Do not exceed 800mg per day",
-    },
-    {
-      id: 3,
-      name: "Metformin",
-      dosage: "500mg",
-      type: "Antidiabetic",
-      frequency: "Twice daily",
-      instructions: "Take with meals",
-    },
-    {
-      id: 4,
-      name: "Atorvastatin",
-      dosage: "10mg",
-      type: "Cholesterol-lowering",
-      frequency: "Once daily",
-      instructions: "Take at the same time each day",
-    },
-    {
-      id: 5,
-      name: "Lisinopril",
-      dosage: "20mg",
-      type: "Blood pressure medication",
-      frequency: "Once daily",
-      instructions: "Take in the morning",
-    },
-    {
-      id: 6,
-      name: "Sertraline",
-      dosage: "50mg",
-      type: "Antidepressant",
-      frequency: "Once daily",
-      instructions: "Take with or without food",
-    },
-    {
-      id: 7,
-      name: "Levothyroxine",
-      dosage: "100mcg",
-      type: "Thyroid medication",
-      frequency: "Once daily",
-      instructions: "Take on an empty stomach",
-    },
-    {
-      id: 8,
-      name: "Omeprazole",
-      dosage: "20mg",
-      type: "Proton pump inhibitor",
-      frequency: "Once daily",
-      instructions: "Take 30 minutes before a meal",
-    },
-    {
-      id: 9,
-      name: "Metoprolol",
-      dosage: "50mg",
-      type: "Beta blocker",
-      frequency: "Twice daily",
-      instructions: "Take with food",
-    },
-    {
-      id: 10,
-      name: "Acetaminophen",
-      dosage: "325mg",
-      type: "Pain reliever",
-      frequency: "Every 4-6 hours as needed",
-      instructions: "Do not exceed 3,000mg per day",
-    },
-  ]
-  const filteredMedications = medications.filter((medication) =>
-    medication.name.toLowerCase().includes(search.toLowerCase()),
-  )
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentMedications = filteredMedications.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(filteredMedications.length / itemsPerPage)
+import { useState, useMemo } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+} from "@/components/ui/pagination";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { useAuth } from "@/app/auth/auth-context";
+import { MoveVerticalIcon } from "lucide-react";
+
+export default function FullInventoryTable() {
+  const { hospitalData } = useAuth();
+  const medications = hospitalData?.medication;
+  const [sortBy, setSortBy] = useState("name");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // You can change the value for items per page
+
+  const filteredMedications = useMemo(() => {
+    return medications
+      ?.filter((medication) =>
+        medication.nameOfDrugs.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      ?.sort((a, b) => {
+        if (a[sortBy] < b[sortBy]) return sortDirection === "asc" ? -1 : 1;
+        if (a[sortBy] > b[sortBy]) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+  }, [searchTerm, sortBy, sortDirection, medications]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMedications = filteredMedications?.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredMedications?.length / itemsPerPage);
+
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
+
   return (
-    <ContainerLayout>
-        <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Inventory Table</h1>
-            <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-                type="text"
-                placeholder="Search medications..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-lg bg-muted/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-            </div>
+    <Card className=" bg-white shadow-lg">
+      <div className="p-4 bg-white">
+        <div className="mb-4 flex items-center justify-between">
+          <Input
+            className="w-full max-w-xs"
+            placeholder="Search medications..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <div className="overflow-auto border rounded-lg">
-            <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead>Medication</TableHead>
-                <TableHead>Dosage</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Frequency</TableHead>
-                <TableHead>Instructions</TableHead>
-                </TableRow>
+        <div className="relative overflow-auto">
+          <Table className="min-w-full text-left">
+            <TableHeader className="sticky top-0 bg-white">
+              <TableRow>
+                {["name", "dosage", "price", "frequency", "in stock","action"].map(
+                  (header) => (
+                    <TableHead
+                      key={header}
+                      className="cursor-pointer p-4"
+                      onClick={() => {
+                        setSortBy(header);
+                        setSortDirection(
+                          sortDirection === "asc" ? "desc" : "asc"
+                        );
+                      }}
+                    >
+                      {header.charAt(0).toUpperCase() + header.slice(1)}
+                      {sortBy === header && (
+                        <span className="ml-2 text-gray-600">
+                          {sortDirection === "asc" ? "\u2191" : "\u2193"}
+                        </span>
+                      )}
+                    </TableHead>
+                  )
+                )}
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {currentMedications.map((medication) => (
-                <TableRow key={medication.id}>
-                      <TableCell className="font-medium">
-                      <Link href="/dashboard/inventory/product-detail/test">
-                        {medication.name}
-                      </Link>
-                      </TableCell>
-                  
-                      <TableCell>
-                      <Link href="/dashboard/inventory/product-detail/test">
-                        {medication.dosage}
-                      </Link>
-                        </TableCell>
-                      <TableCell>
-                        <Link href="/dashboard/inventory/product-detail/test">
-                        {medication.type}
-                      </Link>
-                        </TableCell>
+              {currentMedications?.map((medication) => {
+                const status =
+                  medication.quantityInStock === 0
+                    ? "Out of Stock"
+                    : medication.quantityInStock < medication.reorderLevel
+                    ? "Low Stock"
+                    : medication.inStock
+                    ? "In Stock"
+                    : "Out of Stock";
 
-                      <TableCell>
-                        <Link href="/dashboard/inventory/product-detail/test">
-                          {medication.frequency}
-                        </Link>  
-                      </TableCell>
-                      <TableCell>
-                        <Link href="/dashboard/inventory/product-detail/test">
-                        {medication.instructions}
-                        </Link>  
-                      </TableCell>
-                </TableRow>
-                ))}
+                const statusVariant =
+                  status === "In Stock"
+                    ? "secondary"
+                    : status === "Low Stock"
+                    ? "warning"
+                    : "destructive";
+
+                return (
+                  <TableRow key={medication.id} className="hover:bg-gray-100">
+                    <TableCell className="p-4 font-medium">
+                      <Link
+                        href={`/dashboard/inventory/product-detail/${medication._id}`}
+                      >
+                        {medication.nameOfDrugs}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="p-4">{medication.dosage}</TableCell>
+                    <TableCell className="p-4">
+                      ${medication.price.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="p-4">
+                      {medication.frequency}
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <Badge variant={statusVariant}>{status}</Badge>
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoveVerticalIcon className="h-4 w-4" />
+                            <span className="sr-only">More actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Link
+                            href={`/dashboard/inventory/edit/${medication._id}`}
+                          >
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
+                          <Link href={`/dashboard/inventory/product-detail/${medication._id}`}>
+                            <DropdownMenuItem className="text-red-500">
+                              Details
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link
+                            href={`/dashboard/inventory/delete/${medication._id}`}
+                          >
+                            <DropdownMenuItem className="text-red-500">
+                              Delete
+                            </DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
-            </Table>
+          </Table>
         </div>
-        <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-            Showing {indexOfFirstItem + 1} to {indexOfLastItem} of {filteredMedications.length} medications
-            </div>
-            <Pagination>
+        <div className="flex items-center justify-between p-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {indexOfFirstItem + 1} to {indexOfLastItem} of{" "}
+            {filteredMedications?.length} medications
+          </div>
+          <Pagination>
             <PaginationContent>
-                <PaginationItem>
+              <PaginationItem>
                 <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                  href="#"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                 />
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
-                <PaginationItem key={pageNumber}>
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)?.map(
+                (pageNumber) => (
+                  <PaginationItem key={pageNumber}>
                     <PaginationLink
-                    href="#"
-                    onClick={() => handlePageChange(pageNumber)}
-                    isActive={pageNumber === currentPage}
+                      href="#"
+                      onClick={() => handlePageChange(pageNumber)}
+                      isActive={pageNumber === currentPage}
                     >
-                    {pageNumber}
+                      {pageNumber}
                     </PaginationLink>
-                </PaginationItem>
-                ))}
-                <PaginationItem>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
                 <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                  href="#"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
                 />
-                </PaginationItem>
+              </PaginationItem>
             </PaginationContent>
-            </Pagination>
+          </Pagination>
         </div>
-        </div>
-    </ContainerLayout>
-  )
+      </div>
+    </Card>
+  );
 }
 
 function SearchIcon(props) {

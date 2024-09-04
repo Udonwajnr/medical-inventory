@@ -1,131 +1,164 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Card } from "@/components/ui/card"
-import { Expand } from 'lucide-react';
-import Link from "next/link"
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Card } from "@/components/ui/card";
+import { Expand} from "lucide-react";
+import Link from "next/link";
 
-export default function DrugInventoryTable() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortBy, setSortBy] = useState("name")
-  const [sortDirection, setSortDirection] = useState("asc")
-  const inventory = [
-    { id: 1, name: "Widget A", quantity: 50, price: 9.99, status: "In Stock" },
-    { id: 2, name: "Gadget B", quantity: 12, price: 19.99, status: "Low Stock" },
-    { id: 3, name: "Thingamajig C", quantity: 0, price: 4.99, status: "Out of Stock" },
-    { id: 4, name: "Doodad D", quantity: 100, price: 14.99, status: "In Stock" },
-    { id: 5, name: "Whatchamacallit E", quantity: 25, price: 7.99, status: "In Stock" },
-  ]
+export default function DrugInventoryTable({ hospitalData }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("nameOfDrugs");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const filteredInventory = useMemo(() => {
-    return inventory
-      .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      .sort((a, b) => {
-        if (a[sortBy] < b[sortBy]) return sortDirection === "asc" ? -1 : 1
-        if (a[sortBy] > b[sortBy]) return sortDirection === "asc" ? 1 : -1
-        return 0
-      })
-  }, [searchTerm, sortBy, sortDirection])
+    return hospitalData?.filter((item) =>
+        item.nameOfDrugs.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      ?.sort((a, b) => {
+        if (a[sortBy] < b[sortBy]) return sortDirection === "asc" ? -1 : 1;
+        if (a[sortBy] > b[sortBy]) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+  }, [searchTerm, sortBy, sortDirection, hospitalData]);
 
   return (
-    <Card className="overflow-scroll bg-white shadow-lg col-start-2 col-span-4">
+    <Card className=" bg-white shadow-lg col-start-2 col-span-4">
       <div className="p-4 bg-white">
-        <div className="mb-4 flex items-center justify-between ">
+        <div className="mb-4 flex items-center justify-between">
           <Input
             className="w-full max-w-xs"
             placeholder="Search inventory..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="flex items-center ">
-            <Link href="inventory/table">
-              <Button  variant="ghost" className="ml-4">
-                Expand Table
+          <div className="flex items-center">
+            <Link href="/dashboard/inventory/table">
+              <Button variant="ghost" className="ml-4">
+                Full Table
                 <Expand className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-              <Link href="inventory/create">
-            <Button variant="ghost" className="ml-4 ">
+            <Link href="/dashboard/inventory/create">
+              <Button variant="ghost" className="ml-4">
                 Add Product
                 <PlusIcon className="ml-2 h-4 w-4" />
-            </Button>
-              </Link>
+              </Button>
+            </Link>
           </div>
         </div>
-        <div className="relative overflow-auto">
+        <div className="relative ">
           <Table className="min-w-full text-left">
             <TableHeader className="sticky top-0 bg-white">
               <TableRow>
-                {["name", "quantity", "price"].map((header) => (
-                  <TableHead
-                    key={header}
-                    className="cursor-pointer p-4"
-                    onClick={() => {
-                      setSortBy(header)
-                      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-                    }}
-                  >
-                    {header.charAt(0).toUpperCase() + header.slice(1)}
-                    {sortBy === header && (
-                      <span className="ml-2 text-gray-600">
-                        {sortDirection === "asc" ? "\u2191" : "\u2193"}
-                      </span>
-                    )}
-                  </TableHead>
-                ))}
+                {["nameOfDrugs", "quantityInStock", "price", "expiryDate"].map(
+                  (header) => (
+                    <TableHead
+                      key={header}
+                      className="cursor-pointer p-4"
+                      onClick={() => {
+                        setSortBy(header);
+                        setSortDirection(
+                          sortDirection === "asc" ? "desc" : "asc"
+                        );
+                      }}
+                    >
+                      {header.charAt(0).toUpperCase() + header.slice(1)}
+                      {sortBy === header && (
+                        <span className="ml-2 text-gray-600">
+                          {sortDirection === "asc" ? "\u2191" : "\u2193"}
+                        </span>
+                      )}
+                    </TableHead>
+                  )
+                )}
                 <TableHead className="p-4">Status</TableHead>
                 <TableHead className="p-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredInventory.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-100">
-                  <TableCell className="p-4 font-medium">{item.name}</TableCell>
-                  <TableCell className="p-4">{item.quantity}</TableCell>
-                  <TableCell className="p-4">${item.price.toFixed(2)}</TableCell>
-                  <TableCell className="p-4">
-                    <Badge
-                      variant={
-                        item.status === "In Stock" ? "secondary" : item.status === "Low Stock" ? "warning" : "danger"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="p-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                          <MoveVerticalIcon className="h-4 w-4" />
-                          <span className="sr-only">More actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <Link href="/dashboard/inventory/edit/test">
-                          <DropdownMenuItem>
-                            Edit
-                          </DropdownMenuItem>
-                        </Link>
-                        <Link href="/dashboard/inventory/delete/test">
-                          <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                        
-                        </Link>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredInventory?.slice(0,4).map((item) => {
+                const status =
+                  item.quantityInStock === 0
+                    ? "Out of Stock"
+                    : item.quantityInStock < item.reorderLevel
+                    ? "Low Stock"
+                    : item.inStock
+                    ? "In Stock"
+                    : "Out of Stock";
+
+                const statusVariant =
+                  status === "In Stock"
+                    ? "secondary"
+                    : status === "Low Stock"
+                    ? "warning"
+                    : "destructive";
+
+                return (
+                  <TableRow key={item._id} className="hover:bg-gray-100">
+                    <TableCell className="p-4 font-medium">
+                      {item.nameOfDrugs}
+                    </TableCell>
+                    <TableCell className="p-4">{item.quantityInStock}</TableCell>
+                    <TableCell className="p-4">
+                      ${item.price.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="p-4">
+                      {new Date(item.expiryDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <Badge variant={statusVariant}>{status}</Badge>
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoveVerticalIcon className="h-4 w-4" />
+                            <span className="sr-only">More actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Link href={`/dashboard/inventory/edit/${item._id}`}>
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
+                          <Link href={`/dashboard/inventory/product-detail/${item._id}`}>
+                            <DropdownMenuItem >
+                              Details
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link href={`/dashboard/inventory/delete/${item._id}`}>
+                            <DropdownMenuItem className="text-red-500">
+                              Delete
+                            </DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
       </div>
     </Card>
-  )
+  );
 }
 
 function PlusIcon(props) {

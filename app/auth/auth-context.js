@@ -11,11 +11,14 @@ const AuthContext = createContext();
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [hospitalData, setHospitalData] = useState([]); // Updated to hold hospital data
+    const [medicationData,setMedicationData] = useState([])
+    const [hospitalId,setHospitalId] = useState(null)
     const router = useRouter();
 
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('accessToken');
+
             if (token) {
                 try {
                     // Set the Authorization header with the token
@@ -28,10 +31,7 @@ const AuthContext = createContext();
                         
                         const hospitalResponse = await api.get(`https://medical-api-advo.onrender.com/api/hospital/${response?.data?.hospitalId}`);
                         setHospitalData(hospitalResponse.data);
-                        // Redirect to the dashboard only if the current route is not the dashboard
-                        // if (router.pathname !== '/dashboard') {
-                        //     router.push('/dashboard');
-                        // }
+                        localStorage.setItem("_id",hospitalResponse?.data._id)
                     } else {
                         // Token is not valid, redirect to login
                         setIsAuthenticated(false);
@@ -57,7 +57,7 @@ const AuthContext = createContext();
         };
         checkAuth();
     }, [router]);
-
+console.log(hospitalData)
     // const login = async (token) => {
     //     localStorage.setItem('token', token);
     //     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -80,6 +80,7 @@ const AuthContext = createContext();
         //     console.error('Logout failed:', error);
         // }
         localStorage.removeItem('accessToken');
+        localStorage.removeItem("_id")
         setIsAuthenticated(false);
         setHospitalData(null); // Clear hospital data on logout
         router.push('/login');

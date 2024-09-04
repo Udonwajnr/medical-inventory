@@ -10,7 +10,7 @@ import { useContext } from 'react'
 
 export default function DashBoardHome() {
   const {hospitalData} = useAuth()
-  
+  console.log(hospitalData)
   return (
         <main className="flex-1 overflow-auto p-6">
           <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
@@ -22,19 +22,20 @@ export default function DashBoardHome() {
                 <Users className="text-gray-400" size={24} />
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-semibold">1,234</p>
+                <p className="text-4xl font-semibold">{hospitalData?.user?.length}</p>
                 <Badge variant="outline" className="mt-2">Updated Today</Badge>
               </CardContent>
             </Card>
 
             {/* Total Drug Inventory */}
             <Card className="p-4">
+                {/* filter in stock */}
               <CardHeader className="flex justify-between items-center">
                 <CardTitle>Total Drug Inventory</CardTitle>
                 <Package className="text-gray-400" size={24} />
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-semibold">567</p>
+                <p className="text-4xl font-semibold">{hospitalData?.medication?.length}</p>
                 <Badge variant="outline" className="mt-2">In Stock</Badge>
               </CardContent>
             </Card>

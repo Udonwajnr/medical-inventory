@@ -1,11 +1,24 @@
-// "use client"
+"use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from "@/components/ui/card"
 import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
-
+import { useAuth } from "@/app/auth/auth-context"
+import { useState } from "react"
 export default function InventoryDashboard() {
+  const {hospitalData} = useAuth()
+  const totalPrice = hospitalData?.medication?.reduce((total, medication) => {
+    return total + (medication.price * medication.quantityInStock);
+  }, 0) || 0;
+  
+  // Format the total price
+  const formattedTotalPrice = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(totalPrice);
+
+  const filterLowOnStocks = hospitalData?.medication?.filter((medication)=>medication?.quantityInStock<10).length
 
   return (
       <>
@@ -15,7 +28,8 @@ export default function InventoryDashboard() {
               <CardHeader className="pb-3">
                 <CardTitle>Total Inventory</CardTitle>
                 <CardDescription>
-                  <span className="text-4xl font-bold">2,345</span>
+                  {/* filter in stock */}
+                  <span className="text-4xl font-bold">{hospitalData?.medication?.filter(medication=>medication.inStock===true)?.length || 0}</span>
                   <span className="text-muted-foreground">Total items</span>
                 </CardDescription>
               </CardHeader>
@@ -27,7 +41,7 @@ export default function InventoryDashboard() {
               <CardHeader className="pb-3">
                 <CardTitle>Total Value</CardTitle>
                 <CardDescription>
-                  <span className="text-4xl font-bold">$125,678</span>
+                  <span className="text-4xl font-bold">{formattedTotalPrice}</span>
                   <span className="text-muted-foreground">Total value</span>
                 </CardDescription>
               </CardHeader>
@@ -39,7 +53,7 @@ export default function InventoryDashboard() {
               <CardHeader className="pb-3">
                 <CardTitle>Low Stock</CardTitle>
                 <CardDescription>
-                  <span className="text-4xl font-bold">54</span>
+                  <span className="text-4xl font-bold">{filterLowOnStocks}</span>
                   <span className="text-muted-foreground">Items below minimum</span>
                 </CardDescription>
               </CardHeader>
@@ -124,7 +138,7 @@ export default function InventoryDashboard() {
               </CardFooter>
             </Card>
           
-            <DrugInventoryTable/>
+            <DrugInventoryTable hospitalData={hospitalData?.medication}/>
           </div>
         </main>
       </>

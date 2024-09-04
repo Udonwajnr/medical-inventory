@@ -24,7 +24,7 @@ export default function RegisterHospital() {
 
   // Check if the user is already registered or authenticated
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       router.push("/dashboard");
     }

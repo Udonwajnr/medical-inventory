@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination"
 import ContainerLayout from "@/app/components/ContainerLayout"
+import { useAuth } from "@/app/auth/auth-context"
 
 export default function SearchQueryTable() {
   const [search, setSearch] = useState("")
@@ -103,7 +104,7 @@ export default function SearchQueryTable() {
     setCurrentPage(pageNumber)
   }
   return (
-    <ContainerLayout>
+    <>
         <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Inventory</h1>
@@ -177,7 +178,7 @@ export default function SearchQueryTable() {
             </Pagination>
         </div>
         </div>
-    </ContainerLayout>
+    </>
   )
 }
 
