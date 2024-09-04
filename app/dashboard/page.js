@@ -1,11 +1,16 @@
+"use client"
 import React from 'react'
 import ContainerLayout from '../components/ContainerLayout'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { BarChart, Users, Package, DollarSign } from 'lucide-react' // Assuming you use lucide-react for icons
-
+import { useAuth } from '../auth/auth-context'
+import { AuthProvider } from '../auth/auth-context'
+import { useContext } from 'react'
 
 export default function DashBoardHome() {
+  const {hospitalData} = useAuth()
+  
   return (
         <main className="flex-1 overflow-auto p-6">
           <h1 className="text-2xl font-bold mb-6">Dashboard</h1>

@@ -4,22 +4,18 @@ import { useRouter } from 'next/navigation';
 import api from '../axios/axiosConfig'; // Use your Axios instance
 
 // Create a Context with default values
-const AuthContext = createContext({
-    isAuthenticated: false,
-    hospitalData: null,
-    login: () => {},
-    logout: () => {},
-});
+const AuthContext = createContext();
 
 // Create a provider component
-export function AuthProvider({ children }) {
+ function AuthProvider({ children }) {
+
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [hospitalData, setHospitalData] = useState(null); // Updated to hold hospital data
+    const [hospitalData, setHospitalData] = useState([]); // Updated to hold hospital data
     const router = useRouter();
 
     useEffect(() => {
         const checkAuth = async () => {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessToken');
             if (token) {
                 try {
                     // Set the Authorization header with the token
@@ -28,16 +24,14 @@ export function AuthProvider({ children }) {
                     const response = await api.get('https://medical-api-advo.onrender.com/api/protected-route');
                     if (response.status === 200) {
                         setIsAuthenticated(true);
-                        
-    
                         // Fetch hospital data if token is valid
+                        
                         const hospitalResponse = await api.get(`https://medical-api-advo.onrender.com/api/hospital/${response?.data?.hospitalId}`);
                         setHospitalData(hospitalResponse.data);
-    
                         // Redirect to the dashboard only if the current route is not the dashboard
-                        if (router.pathname !== '/dashboard') {
-                            router.push('/dashboard');
-                        }
+                        // if (router.pathname !== '/dashboard') {
+                        //     router.push('/dashboard');
+                        // }
                     } else {
                         // Token is not valid, redirect to login
                         setIsAuthenticated(false);
@@ -60,41 +54,39 @@ export function AuthProvider({ children }) {
                     router.push('/login');
                 }
             }
-
         };
         checkAuth();
     }, [router]);
-    
 
-    const login = async (token) => {
-        localStorage.setItem('token', token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setIsAuthenticated(true);
-        try {
-            // Fetch hospital data after login
-            const hospitalResponse = await api.get('/api/hospital-data');
-            setHospitalData(hospitalResponse.data);
-        } catch (error) {
-            console.error('Failed to fetch hospital data:', error);
-        }
-        router.push('/dashboard');
-    };
+    // const login = async (token) => {
+    //     localStorage.setItem('token', token);
+    //     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    //     setIsAuthenticated(true);
+    //     try {
+    //         // Fetch hospital data after login
+    //         const hospitalResponse = await api.get('/api/hospital-data');
+    //         setHospitalData(hospitalResponse.data);
+    //     } catch (error) {
+    //         console.error('Failed to fetch hospital data:', error);
+    //     }
+    //     router.push('/dashboard');
+    // };
 
     const logout = async () => {
-        try {
-            // Optionally notify the server about logout here
-            await api.post('/api/auth/logout');
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-        localStorage.removeItem('token');
+        // try {
+        //     // Optionally notify the server about logout here
+        //     await api.post('/api/auth/logout');
+        // } catch (error) {
+        //     console.error('Logout failed:', error);
+        // }
+        localStorage.removeItem('accessToken');
         setIsAuthenticated(false);
         setHospitalData(null); // Clear hospital data on logout
         router.push('/login');
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, hospitalData, login, logout,hospitalData }}>
+        <AuthContext.Provider value={{ isAuthenticated, hospitalData, logout }}>
             {children}
         </AuthContext.Provider>
     );
@@ -104,3 +96,5 @@ export function AuthProvider({ children }) {
 export function useAuth() {
     return useContext(AuthContext);
 }
+
+export {AuthContext,AuthProvider}

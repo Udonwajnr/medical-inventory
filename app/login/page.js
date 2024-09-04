@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Bars } from "react-loader-spinner"; // Importing the spinner component
 import api from "../axios/axiosConfig";
@@ -17,16 +16,15 @@ export default function LoginHospital() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-   // Check if user is already authenticated
-   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // If a token is found, redirect to the dashboard
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      // If an access token is found, redirect to the dashboard
       router.push('/dashboard');
     }
-  }, [router]);
+}, []);
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -37,11 +35,11 @@ export default function LoginHospital() {
         email,
         password,
       });
-
-      // Save the token to localStorage
-      localStorage.setItem('token', response.data.accessToken); // Assuming the response contains accessToken
-
-      // Redirect to the dashboard or another page`
+      console.log(response)
+      // Save the access token to localStorage
+      localStorage.setItem('accessToken', response.data.accessToken); // Store access token under a different key
+      
+      // Redirect to the dashboard or another page
       router.push('/dashboard');
     } catch (error) {
       if (error.response && error.response.data.msg) {
@@ -53,7 +51,8 @@ export default function LoginHospital() {
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
 
   return (

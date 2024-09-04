@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from "@/components/ui/card"
 import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
+
 export default function InventoryDashboard() {
+
   return (
       <>
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
