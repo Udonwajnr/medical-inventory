@@ -7,10 +7,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter, useParams } from "next/navigation";
-import { useAuth } from "@/app/auth/auth-context";
 import api from "@/app/axios/axiosConfig";
 import { Bars } from "react-loader-spinner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner"
 
 export default function EditProductInventory() {
   const router = useRouter();
@@ -46,8 +46,11 @@ export default function EditProductInventory() {
     const updatedProduct = {
       nameOfDrugs: formData.get("nameOfDrugs"),
       dosage: formData.get("dosage"),
+      dosageForm: formData.get("dosageForm"),
+      dosageAmount: parseInt(formData.get("dosageAmount")),
       frequency: formData.get("frequency"),
-      time: formData.get("time"),
+      duration: formData.get("duration"),
+      numberOfUnits: parseInt(formData.get("numberOfUnits")),
       notes: formData.get("notes"),
       quantityInStock: parseInt(formData.get("quantityInStock")),
       barcode: formData.get("barcode"),
@@ -66,6 +69,7 @@ export default function EditProductInventory() {
       if (response.status !== 200) {
         throw new Error("Failed to update product");
       }
+      toast('Medication to updated Successfully')
       router.push("/dashboard/inventory"); // Redirect after success
     } catch (err) {
       // Check specific error messages based on the schema
@@ -73,13 +77,14 @@ export default function EditProductInventory() {
         setError(Object.values(err.response.data.errors).map((e) => e.message).join(", "));
       } else {
         setError(err.message || "Failed to update product");
+        toast.error('Failed to update product')
       }
       console.log(err);
     } finally {
       setSaving(false);
     }
   };
-
+console.log(product)
   if (loading) {
     return (
       <div className="p-6">
@@ -91,9 +96,9 @@ export default function EditProductInventory() {
     );
   }
 
-  if (error) {
-    return <p className="text-red-500">Error: {error}</p>;
-  }
+  // if (error) {
+  //   return <p className="text-red-500">Error: {error}</p>;
+  // }
 
   return (
     <main className="flex-1 overflow-auto p-6">
@@ -116,19 +121,58 @@ export default function EditProductInventory() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="dosage">Dosage</Label>
-                <Input id="dosage" name="dosage" defaultValue={product?.dosage || ""} placeholder="100 mg" />
+                <Input
+                  id="dosage"
+                  name="dosage"
+                  defaultValue={product?.dosage || ""}
+                  placeholder="100 mg"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="dosageForm">Dosage Form</Label>
+                <Input
+                  id="dosageForm"
+                  name="dosageForm"
+                  defaultValue={product?.dosageForm || ""}
+                  placeholder="Tablet"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="dosageAmount">Dosage Amount</Label>
+                <Input
+                  id="dosageAmount"
+                  name="dosageAmount"
+                  type="number"
+                  defaultValue={product?.dosageAmount || ""}
+                  placeholder="2"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="frequency">Frequency</Label>
-                <Input id="frequency" name="frequency" defaultValue={product?.frequency || ""} placeholder="Daily" />
+                <Input
+                  id="frequency"
+                  name="frequency"
+                  defaultValue={product?.frequency || ""}
+                  placeholder="Every 6 hours"
+                />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="time">Time</Label>
+                <Label htmlFor="duration">Duration</Label>
                 <Input
-                  id="time"
-                  name="time"
-                  type="datetime-local"
-                  defaultValue={product?.time ? new Date(product.time).toISOString().slice(0, 16) : ""}
+                  id="duration"
+                  name="duration"
+                  defaultValue={product?.duration || ""}
+                  placeholder="5 days"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="numberOfUnits">Number of Units</Label>
+                <Input
+                  id="numberOfUnits"
+                  name="numberOfUnits"
+                  type="number"
+                  defaultValue={product?.numberOfUnits || ""}
+                  placeholder="30"
                 />
               </div>
               <div className="grid gap-2">
@@ -154,7 +198,12 @@ export default function EditProductInventory() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="barcode">Barcode</Label>
-                  <Input id="barcode" name="barcode" defaultValue={product?.barcode || ""} placeholder="123456789012" />
+                  <Input
+                    id="barcode"
+                    name="barcode"
+                    defaultValue={product?.barcode || ""}
+                    placeholder="123456789012"
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="price">Price</Label>
@@ -178,7 +227,12 @@ export default function EditProductInventory() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="inStock">In Stock</Label>
-                  <Input id="inStock" name="inStock" type="checkbox" defaultChecked={product?.inStock || false} />
+                  <Input
+                    id="inStock"
+                    name="inStock"
+                    type="checkbox"
+                    defaultChecked={product?.inStock || false}
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="reorderLevel">Reorder Level</Label>

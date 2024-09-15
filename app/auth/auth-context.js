@@ -57,7 +57,6 @@ const AuthContext = createContext();
         };
         checkAuth();
     }, [router]);
-console.log(hospitalData)
     // const login = async (token) => {
     //     localStorage.setItem('token', token);
     //     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

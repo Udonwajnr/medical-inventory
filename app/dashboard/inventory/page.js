@@ -6,6 +6,7 @@ import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
 import { useAuth } from "@/app/auth/auth-context"
 import { useState } from "react"
+
 export default function InventoryDashboard() {
   const {hospitalData} = useAuth()
   const totalPrice = hospitalData?.medication?.reduce((total, medication) => {

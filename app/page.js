@@ -1,4 +1,6 @@
+"use client"
 import Link from "next/link";
+import {useState,useEffect} from "react"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +12,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from 'lucide-react';
-import { AuthProvider } from "./auth/auth-context";
+import axios from "axios";
 
 export default function InventoryLandingPage() {
+  useEffect(()=>{
+     axios.get('https://medical-api-advo.onrender.com')
+     .then((data)=>console.log("ready")).catch((err)=>console.log(err))
+  },[])
   return (
     <>
       <div className="flex flex-col min-h-screen bg-gradient-to-r from-blue-100 via-green-100 to-blue-50">

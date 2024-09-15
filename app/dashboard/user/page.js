@@ -1,13 +1,35 @@
+"use client"
 import React from 'react'
-// "use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent } from "@/components/ui/card"
 import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
 import UserTable from '@/app/components/UserTable'
-
+import { useEffect,useState } from 'react'
+import api from '@/app/axios/axiosConfig'
 export default function UserManagementDashboard() {
+    const [hospital, setHospital] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const hospitalId = localStorage.getItem("_id")
+        const response = await api.get(`https://medical-api-advo.onrender.com/api/hospital/${hospitalId}`);
+        setHospital(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchUsers();
+  }, []);
+
+  console.log(hospital)
   return (
     <>
     <div>
@@ -16,45 +38,22 @@ export default function UserManagementDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle>Total Users</CardTitle>
+                        <CardTitle>Total Patients</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">1,245</span>
-                            <span className="text-muted-foreground">Total registered users</span>
+                            <span className="text-4xl font-bold">{hospital?.users?.length || 0}</span>
+                            <span className="text-muted-foreground">Total Patients</span>
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
                         <Button variant="outline">View Users</Button>
                     </CardFooter>
                 </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle>Active Users</CardTitle>
-                        <CardDescription>
-                            <span className="text-4xl font-bold">876</span>
-                            <span className="text-muted-foreground">Users active in the last 7 days</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        <Button variant="outline">View Activity</Button>
-                    </CardFooter>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle>Pending Approvals</CardTitle>
-                        <CardDescription>
-                            <span className="text-4xl font-bold">16</span>
-                            <span className="text-muted-foreground">Users awaiting approval</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        <Button variant="outline">Review Approvals</Button>
-                    </CardFooter>
-                </Card>
+    
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle>Admins</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">5</span>
+                            <span className="text-4xl font-bold">0</span>
                             <span className="text-muted-foreground">Total admin users</span>
                         </CardDescription>
                     </CardHeader>
@@ -67,7 +66,7 @@ export default function UserManagementDashboard() {
                     <CardHeader className="pb-3">
                         <CardTitle>Users with Medications</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">320</span>
+                            <span className="text-4xl font-bold">{hospital?.users?.[0]?.medication?.length}</span>
                             <span className="text-muted-foreground">Users currently on medication</span>
                         </CardDescription>
                     </CardHeader>
@@ -77,26 +76,14 @@ export default function UserManagementDashboard() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle>Recent Logins</CardTitle>
+                        <CardTitle>Users with Custom Medications Regimen</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">150</span>
-                            <span className="text-muted-foreground">Users logged in this week</span>
+                            <span className="text-4xl font-bold">{hospital?.userSpecificMedicationRegimen?.length||0}</span>
+                            <span className="text-muted-foreground">Total Users with Custom Medications Regimen</span>
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
                         <Button variant="outline">View Logins</Button>
-                    </CardFooter>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle>Inactive Users</CardTitle>
-                        <CardDescription>
-                            <span className="text-4xl font-bold">60</span>
-                            <span className="text-muted-foreground">Users inactive for 30+ days</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        <Button variant="outline">Reactivate Users</Button>
                     </CardFooter>
                 </Card>
             </div>
