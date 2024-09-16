@@ -1,85 +1,137 @@
-"use client"
-import { useState,useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import api from "@/app/axios/axiosConfig"
-import { Bars } from "react-loader-spinner"
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import api from "@/app/axios/axiosConfig";
+import { Bars } from "react-loader-spinner";
+
 export default function CreateUser({ hospitalId }) {
-  const router = useRouter()
-  const [hospital,setHospital] = useState("")
-  useEffect(()=>{
-    const hospitalId = localStorage.getItem("_id")
-    setHospital(hospitalId)
-  },[])
+  const router = useRouter();
+  const [hospital, setHospital] = useState("");
+  const [medicationsData, setMedicationsData] = useState([]); // Store fetched medications data
+  const [filteredMedications, setFilteredMedications] = useState([]); // For search suggestions
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
     gender: "",
     phoneNumber: "",
     email: "",
-    medications: [{ name: "" }]
-  })
+    medications: [{ nameOfDrugs: "", id: "" }], // Include id field
+  });
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const hospitalId = localStorage.getItem("_id");
+    setHospital(hospitalId);
+
+    // Fetch medication list when component mounts
+    const fetchMedications = async () => {
+      try {
+        const response = await api.get(
+          `https://medical-api-advo.onrender.com/api/medication/${hospitalId}/medications`
+        ); // Replace with your API endpoint
+        setMedicationsData(response.data);
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching medications:", error);
+      }
+    };
+
+    fetchMedications();
+  }, []);
 
   // Function to handle input change for the form
   const handleInputChange = (e) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   // Function to handle gender change
   const handleGenderChange = (value) => {
-    setFormData((prev) => ({ ...prev, gender: value }))
-  }
+    setFormData((prev) => ({ ...prev, gender: value }));
+  };
 
   // Function to handle adding a new medication field
   const handleAddMedication = () => {
     setFormData((prev) => ({
       ...prev,
-      medications: [...prev.medications, { name: "" }]
-    }))
-  }
+      medications: [...prev.medications, { nameOfDrugs: "", id: "" }],
+    }));
+  };
 
   // Function to handle removing a medication field
   const handleRemoveMedication = (index) => {
-    const newMedications = formData.medications.filter((_, i) => i !== index)
-    setFormData((prev) => ({ ...prev, medications: newMedications }))
-  }
+    const newMedications = formData.medications.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
+  };
 
   // Function to handle medication field change
   const handleMedicationChange = (index, value) => {
+    const medicationName = value;
+
+    // Search for medications based on input
+    const filtered = medicationsData.filter((med) =>
+      med.nameOfDrugs.toLowerCase().includes(medicationName.toLowerCase())
+    );
+    setFilteredMedications(filtered);
+
+    // Update the medication name in the form data
     const newMedications = formData.medications.map((medication, i) =>
-      i === index ? { ...medication, name: value } : medication
-    )
-    setFormData((prev) => ({ ...prev, medications: newMedications }))
-  }
+      i === index ? { ...medication, nameOfDrugs: medicationName, id: "" } : medication
+    );
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
+  };
+
+  // Function to handle selecting a medication from the dropdown
+  const handleSelectMedication = (index, selectedMedication) => {
+    const newMedications = formData.medications.map((medication, i) =>
+      i === index
+        ? { ...medication, nameOfDrugs: selectedMedication.nameOfDrugs, id: selectedMedication._id }
+        : medication
+    );
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
+    setFilteredMedications([]); // Hide the dropdown after selecting
+  };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await api.post(
         `https://medical-api-advo.onrender.com/api/user/hospital/${hospital}/users`,
         formData
-      )
-      console.log("User created:", response.data)
+      );
+      console.log("User created:", response.data);
 
       // Redirect or reset form after successful submission
-      router.push("/dashboard/user")
+      router.push("/dashboard/user");
     } catch (error) {
-      console.error("Error creating user:", error)
+      console.error("Error creating user:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
+  console.log(formData)
   return (
     <>
       <main className="flex-1 overflow-auto p-6">
@@ -150,16 +202,48 @@ export default function CreateUser({ hospitalId }) {
                 <div className="grid gap-2">
                   <Label>Medications</Label>
                   {formData.medications.map((medication, index) => (
-                    <div key={index} className="flex items-center gap-2">
+                    <div key={index} className="flex items-center gap-2 relative">
                       <Input
                         type="text"
                         placeholder="Medication Name"
-                        value={medication.name}
+                        value={medication.nameOfDrugs}
                         onChange={(e) =>
                           handleMedicationChange(index, e.target.value)
                         }
                         required
                       />
+                      {filteredMedications.length > 0 && (
+                          <ul className="absolute top-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                            {filteredMedications.map((med) => (
+                              <li
+                                key={med._id}
+                                className="p-4 hover:bg-blue-50 cursor-pointer flex items-center justify-between"
+                                onClick={() => handleSelectMedication(index, med)}
+                              >
+                                <div className="flex flex-col">
+                                  {/* Medication Name */}
+                                  <span className="text-sm font-semibold text-gray-700">
+                                    {med.nameOfDrugs}
+                                  </span>
+                                  {/* Dosage Information */}
+                                  <span className="text-xs text-gray-500">
+                                    Dosage: {med.dosage || "N/A"}
+                                  </span>
+                                  {/* Add any other relevant information */}
+                                  <span className="text-xs text-gray-400">
+                                    {med.description || "No description available"}
+                                  </span>
+                                </div>
+                                {/* Additional Actions (optional) */}
+                                <span className="text-xs text-blue-600 hover:underline">
+                                  Select
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                      )}
+
+
                       <Button
                         variant="destructive"
                         onClick={() => handleRemoveMedication(index)}
@@ -174,7 +258,7 @@ export default function CreateUser({ hospitalId }) {
                 </div>
 
                 <Button type="submit" disabled={loading}>
-                  {loading ? <Bars color="#ffffff" height={24} width={24} />  : "Create User"}
+                  {loading ? <Bars color="#ffffff" height={24} width={24} /> : "Create User"}
                 </Button>
               </form>
             </CardContent>
@@ -182,5 +266,5 @@ export default function CreateUser({ hospitalId }) {
         </div>
       </main>
     </>
-  )
+  );
 }
