@@ -14,9 +14,9 @@ export default function InventoryDashboard() {
   }, 0) || 0;
   
   // Format the total price
-  const formattedTotalPrice = new Intl.NumberFormat('en-US', {
+  const formattedTotalPrice = new Intl.NumberFormat('en-NG', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'NGN',
   }).format(totalPrice);
 
   const filterLowOnStocks = hospitalData?.medication?.filter((medication)=>medication?.quantityInStock<10).length

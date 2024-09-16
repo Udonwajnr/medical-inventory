@@ -8,7 +8,8 @@ import ContainerLayout from "@/app/components/ContainerLayout"
 import UserTable from '@/app/components/UserTable'
 import { useEffect,useState } from 'react'
 import api from '@/app/axios/axiosConfig'
-export default function UserManagementDashboard() {
+
+export default function UserDashboard() {
     const [hospital, setHospital] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,10 +39,10 @@ export default function UserManagementDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle>Total Patients</CardTitle>
+                        <CardTitle>Total Users</CardTitle>
                         <CardDescription>
                             <span className="text-4xl font-bold">{hospital?.users?.length || 0}</span>
-                            <span className="text-muted-foreground">Total Patients</span>
+                            <span className="text-muted-foreground">Total Users</span>
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
@@ -49,7 +50,7 @@ export default function UserManagementDashboard() {
                     </CardFooter>
                 </Card>
     
-                <Card>
+                {/* <Card>
                     <CardHeader className="pb-3">
                         <CardTitle>Admins</CardTitle>
                         <CardDescription>
@@ -60,7 +61,7 @@ export default function UserManagementDashboard() {
                     <CardFooter>
                         <Button variant="outline">Manage Admins</Button>
                     </CardFooter>
-                </Card>
+                </Card> */}
                 {/* New Cards */}
                 <Card>
                     <CardHeader className="pb-3">
@@ -83,7 +84,7 @@ export default function UserManagementDashboard() {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
-                        <Button variant="outline">View Logins</Button>
+                        <Button variant="outline">View Users with Regimen</Button>
                     </CardFooter>
                 </Card>
             </div>
@@ -96,39 +97,20 @@ export default function UserManagementDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4">
-                            <div className="flex items-center justify-between">
+                            {hospital?.users?.slice(0,4)?.map((user)=>{
+                        return(
+                            <div key={user._id} className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div>
-                                        <div className="font-medium">John Doe</div>
-                                        <div className="text-sm text-muted-foreground">Registered 2 days ago</div>
+                                        <div className="font-medium">{user.fullName}</div>
+                                        <div className="text-sm text-muted-foreground">{user.created}</div>
                                     </div>
                                 </div>
                                 <Button size="icon" variant="ghost">
                                     <ExpandIcon className="h-5 w-5" />
                                 </Button>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div>
-                                        <div className="font-medium">Jane Smith</div>
-                                        <div className="text-sm text-muted-foreground">Registered 4 days ago</div>
-                                    </div>
-                                </div>
-                                <Button size="icon" variant="ghost">
-                                    <ExpandIcon className="h-5 w-5" />
-                                </Button>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div>
-                                        <div className="font-medium">Michael Brown</div>
-                                        <div className="text-sm text-muted-foreground">Registered 5 days ago</div>
-                                    </div>
-                                </div>
-                                <Button size="icon" variant="ghost">
-                                    <ExpandIcon className="h-5 w-5" />
-                                </Button>
-                            </div>
+                            </div>) 
+                            })}
                         </div>
                     </CardContent>
                     <CardFooter>
