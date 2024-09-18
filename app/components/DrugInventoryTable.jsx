@@ -26,7 +26,10 @@ export default function DrugInventoryTable({ hospitalData }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("nameOfDrugs");
   const [sortDirection, setSortDirection] = useState("asc");
-
+  const formattedPrice = new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+  });
   const filteredInventory = useMemo(() => {
     return hospitalData?.filter((item) =>
         item.nameOfDrugs.toLowerCase().includes(searchTerm.toLowerCase())
@@ -117,7 +120,8 @@ export default function DrugInventoryTable({ hospitalData }) {
                     </TableCell>
                     <TableCell className="p-4">{item.quantityInStock}</TableCell>
                     <TableCell className="p-4">
-                      ${item.price.toFixed(2)}
+                      {formattedPrice.format(item.price)}
+                      {/* {item.price.toFixed(2)} */}
                     </TableCell>
                     <TableCell className="p-4">
                       {new Date(item.expiryDate).toLocaleDateString()}

@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import api from "@/app/axios/axiosConfig";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ProductDetails() {
+export default function MedicationDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export default function ProductDetails() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProductData = async () => {
       try {
         const hospitalId = localStorage.getItem("_id"); // Fetch hospital ID from localStorage
         const response = await api.get(
@@ -26,7 +26,7 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchProductData();
   }, [id]);
 
   if (loading) {
@@ -50,73 +50,52 @@ export default function ProductDetails() {
   }
 
   return (
-    <>
-      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-12">
-        <div className="grid gap-6 md:gap-8">
-          <div>
-            <h1 className="text-2xl font-bold">{product?.nameOfDrugs}</h1>
-            <p className="text-muted-foreground">Generic Name: {product?.genericName}</p>
-          </div>
-          <div className="grid gap-4">
-            <div>
-              <h2 className="text-lg font-semibold">Dosage Information</h2>
-              <p>{product?.dosage || "Dosage details not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Frequency</h2>
-              <p>{product?.frequency || "Frequency details not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Time</h2>
-              <p>{product?.time ? new Date(product.time).toLocaleTimeString() : "Time details not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Description</h2>
-              <p>{product?.notes || "Description not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Quantity In Stock</h2>
-              <p>{product?.quantityInStock || "Stock quantity not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Barcode</h2>
-              <p>{product?.barcode || "Barcode not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Price</h2>
-              <p>{product?.price ? `$${product.price}` : "Price not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Expiry Date</h2>
-              <p>{product?.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : "Expiry date not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">In Stock</h2>
-              <p>{product?.inStock ? "Yes" : "No"}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Reorder Level</h2>
-              <p>{product?.reorderLevel || "Reorder level not available."}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Precautions and Warnings</h2>
-              <ul className="grid gap-2">
-                {product?.precautions?.length > 0 ? (
-                  product.precautions.map((precaution, index) => (
-                    <li key={index}>{precaution}</li>
-                  ))
-                ) : (
-                  <li>No precautions listed.</li>
-                )}
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">Storage Instructions</h2>
-              <p>{product?.storageInstructions || "Storage instructions not available."}</p>
-            </div>
-          </div>
+    <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-12">
+      <div className="grid gap-6 md:gap-8">
+        <div>
+          <h1 className="text-2xl font-bold">{product?.nameOfDrugs}</h1>
+          <p className="text-muted-foreground">
+            Generic Name: {product?.genericName || "Not available"}
+          </p>
+        </div>
+        <div className="grid gap-4">
+          <DetailSection title="Dosage Information" content={product?.dosage || "Dosage details not available."} />
+          <DetailSection title="Frequency" content={formatFrequency(product?.frequency)} />
+          <DetailSection title="Time" content={product?.time ? new Date(product.time).toLocaleTimeString() : "Time details not available."} />
+          <DetailSection title="Description" content={product?.notes || "Description not available."} />
+          <DetailSection title="Quantity In Stock" content={product?.quantityInStock || "Stock quantity not available."} />
+          <DetailSection title="Barcode" content={product?.barcode || "Barcode not available."} />
+          <DetailSection title="Price" content={product?.price ? `$${product.price}` : "Price not available."} />
+          <DetailSection title="Expiry Date" content={product?.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : "Expiry date not available."} />
+          <DetailSection title="In Stock" content={product?.inStock ? "Yes" : "No"} />
+          <DetailSection title="Reorder Level" content={product?.reorderLevel || "Reorder level not available."} />
+          <DetailSection title="Precautions and Warnings" content={formatList(product?.precautions)} />
+          <DetailSection title="Storage Instructions" content={product?.storageInstructions || "Storage instructions not available."} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
+
+const DetailSection = ({ title, content }) => (
+  <div>
+    <h2 className="text-lg font-semibold">{title}</h2>
+    <p>{content}</p>
+  </div>
+);
+
+const formatFrequency = (frequency) => {
+  if (!frequency) return "Frequency details not available.";
+  return `${frequency.value} ${frequency.unit}`;
+};
+
+const formatList = (items) => {
+  if (!items || items.length === 0) return "No items listed.";
+  return (
+    <ul className="grid gap-2">
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+};

@@ -6,13 +6,14 @@ import DrugInventoryTable from "../../components/DrugInventoryTable"
 import ContainerLayout from "@/app/components/ContainerLayout"
 import { useAuth } from "@/app/auth/auth-context"
 import { useState } from "react"
+import { format } from "date-fns"
 
 export default function InventoryDashboard() {
   const {hospitalData} = useAuth()
   const totalPrice = hospitalData?.medication?.reduce((total, medication) => {
     return total + (medication.price * medication.quantityInStock);
   }, 0) || 0;
-  
+   
   // Format the total price
   const formattedTotalPrice = new Intl.NumberFormat('en-NG', {
     style: 'currency',
@@ -20,6 +21,8 @@ export default function InventoryDashboard() {
   }).format(totalPrice);
 
   const filterLowOnStocks = hospitalData?.medication?.filter((medication)=>medication?.quantityInStock<10).length
+  
+  const sortedMedications = hospitalData?.medication?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
       <>
@@ -76,24 +79,38 @@ export default function InventoryDashboard() {
                 </Link>
               </CardFooter>
           </Card>
+          <Card>
+              <CardHeader className="pb-3">
+                <CardTitle>Medication Table</CardTitle>
+                <CardDescription>
+                  {/* <span className="text-4xl font-bold">+</span> */}
+                  <span className="text-muted-foreground">See All Your Medication </span>
+                </CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Link  href="/dashboard/inventory/table">
+                  <Button variant="outline">See Medication Table</Button>
+                </Link>
+              </CardFooter>
+          </Card>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
          
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle>Top Selling Products</CardTitle>
+                <CardTitle>Recently Added Medication</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
-                  {hospitalData?.medication?.slice(0,5).map((medication)=>{
+                  {sortedMedications?.slice(0,5).map((medication)=>{
                     return(
                       <div key={hospitalData._id} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           
                           <div>
                             <div className="font-medium">{medication.nameOfDrugs}</div>
-                            <div className="text-sm text-muted-foreground">Sold 1,234 units</div>
+                            <div className="text-sm text-muted-foreground">{format(new Date(medication.createdAt), 'MMMM d, yyyy')}</div>
                           </div>
                         </div>
                         <Link href={`/dashboard/inventory/${medication._id}`}>
@@ -110,15 +127,12 @@ export default function InventoryDashboard() {
                 <Button variant="outline">View All</Button>
               </CardFooter>
             </Card>
-          
             <DrugInventoryTable hospitalData={hospitalData?.medication}/>
           </div>
         </main>
       </>
   )
 }
-
-
 
 function ExpandIcon(props) {
   return (

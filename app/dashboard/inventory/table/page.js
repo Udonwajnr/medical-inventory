@@ -134,7 +134,7 @@ export default function FullInventoryTable() {
                       ${medication.price.toFixed(2)}
                     </TableCell>
                     <TableCell className="p-4">
-                      {medication.frequency}
+                      {medication.frequency.value + ""+ medication.frequency.unit}
                     </TableCell>
                     <TableCell className="p-4">
                       <Badge variant={statusVariant}>{status}</Badge>

@@ -10,18 +10,30 @@ export default function DeleteMedication() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState(null);
   const [hospitalId, setHospitalId] = useState(null);
+  const [validMedication,setValidMedication] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
-    const hospitalId = localStorage.getItem("_id");
-    if (!id) {
-      setError("Hospital ID not found. Redirecting...");
-      setTimeout(() => {
-        router.push("/dashboard/inventory");
-      }, 2000);
-    } else {
-      setHospitalId(hospitalId);
+    const checkMedication = async()=>{
+        try{
+          const hospital = localStorage.getItem("_id");
+          const response = api.get(
+            `https://medical-api-advo.onrender.com/api/medication/${hospital}/medications/${id}`
+          ).then((data)=>{
+            setHospitalId(hospital)
+            setValidMedication(true)
+          })
+          .catch((err)=>{
+            console.log(err)
+            setValidMedication(false)
+            setError("Medication Not Found");
+          }) 
+        }
+        catch(err){
+          setError("Medication Not Found");
+        }
     }
+    checkMedication()
   }, [router]);
 
   const handleDelete = async () => {
@@ -40,6 +52,7 @@ export default function DeleteMedication() {
       router.push("/dashboard/inventory");
     } catch (err) {
       setError("Failed to delete the item.");
+      console.log(err)
     } finally {
       setIsDeleting(false);
     }
@@ -55,7 +68,7 @@ export default function DeleteMedication() {
         </p>
         {error && <p className="mt-2 text-red-500">{error}</p>}
         <div className="mt-6 flex justify-center gap-4">
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting || !validMedication}>
             {isDeleting ? "Deleting..." : "Confirm Delete"}
           </Button>
           <Link href="/dashboard/inventory">
