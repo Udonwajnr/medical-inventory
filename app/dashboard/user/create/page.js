@@ -1,23 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import api from "@/app/axios/axiosConfig";
 import { Bars } from "react-loader-spinner";
 
@@ -35,40 +23,48 @@ export default function CreateUser({ hospitalId }) {
     medications: [{ nameOfDrugs: "", id: "" }], // Include id field
   });
 
+  const wrapperRef = useRef(null); // To reference the dropdown wrapper
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const hospitalId = localStorage.getItem("_id");
     setHospital(hospitalId);
 
-    // Fetch medication list when component mounts
     const fetchMedications = async () => {
       try {
         const response = await api.get(
           `https://medical-api-advo.onrender.com/api/medication/${hospitalId}/medications`
-        ); // Replace with your API endpoint
+        );
         setMedicationsData(response.data);
-        console.log(response);
       } catch (error) {
         console.error("Error fetching medications:", error);
       }
     };
 
     fetchMedications();
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setFilteredMedications([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  // Function to handle input change for the form
+  // Handle input changes
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  // Function to handle gender change
   const handleGenderChange = (value) => {
     setFormData((prev) => ({ ...prev, gender: value }));
   };
 
-  // Function to handle adding a new medication field
   const handleAddMedication = () => {
     setFormData((prev) => ({
       ...prev,
@@ -76,30 +72,24 @@ export default function CreateUser({ hospitalId }) {
     }));
   };
 
-  // Function to handle removing a medication field
   const handleRemoveMedication = (index) => {
     const newMedications = formData.medications.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, medications: newMedications }));
   };
 
-  // Function to handle medication field change
   const handleMedicationChange = (index, value) => {
     const medicationName = value;
-
-    // Search for medications based on input
     const filtered = medicationsData.filter((med) =>
       med.nameOfDrugs.toLowerCase().includes(medicationName.toLowerCase())
     );
     setFilteredMedications(filtered);
 
-    // Update the medication name in the form data
     const newMedications = formData.medications.map((medication, i) =>
       i === index ? { ...medication, nameOfDrugs: medicationName, id: "" } : medication
     );
     setFormData((prev) => ({ ...prev, medications: newMedications }));
   };
 
-  // Function to handle selecting a medication from the dropdown
   const handleSelectMedication = (index, selectedMedication) => {
     const newMedications = formData.medications.map((medication, i) =>
       i === index
@@ -107,10 +97,9 @@ export default function CreateUser({ hospitalId }) {
         : medication
     );
     setFormData((prev) => ({ ...prev, medications: newMedications }));
-    setFilteredMedications([]); // Hide the dropdown after selecting
+    setFilteredMedications([]);
   };
 
-  // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -120,9 +109,6 @@ export default function CreateUser({ hospitalId }) {
         `https://medical-api-advo.onrender.com/api/user/hospital/${hospital}/users`,
         formData
       );
-      console.log("User created:", response.data);
-
-      // Redirect or reset form after successful submission
       router.push("/dashboard/user");
     } catch (error) {
       console.error("Error creating user:", error);
@@ -131,140 +117,124 @@ export default function CreateUser({ hospitalId }) {
     }
   };
 
-  console.log(formData)
   return (
-    <>
-      <main className="flex-1 overflow-auto p-6">
-        <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create User</CardTitle>
-              <CardDescription>Fill out the form to add a new user.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="grid gap-4" onSubmit={handleSubmit}>
-                <div className="grid gap-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    placeholder="John Doe"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2 w-full">
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select onValueChange={handleGenderChange}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select Gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input
-                    id="phoneNumber"
-                    placeholder="123-456-7890"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="johndoe@example.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+    <main className="flex-1 overflow-auto p-6">
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create User</CardTitle>
+            <CardDescription>Fill out the form to add a new user.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="grid gap-4" onSubmit={handleSubmit}>
+              <div className="grid gap-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2 w-full">
+                <Label htmlFor="gender">Gender</Label>
+                <Select onValueChange={handleGenderChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  placeholder="123-456-7890"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="johndoe@example.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-                {/* Medication Section */}
-                <div className="grid gap-2">
-                  <Label>Medications</Label>
-                  {formData.medications.map((medication, index) => (
-                    <div key={index} className="flex items-center gap-2 relative">
-                      <Input
-                        type="text"
-                        placeholder="Medication Name"
-                        value={medication.nameOfDrugs}
-                        onChange={(e) =>
-                          handleMedicationChange(index, e.target.value)
-                        }
-                        required
-                      />
-                      {filteredMedications.length > 0 && (
-                          <ul className="absolute top-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                            {filteredMedications.map((med) => (
-                              <li
-                                key={med._id}
-                                className="p-4 hover:bg-blue-50 cursor-pointer flex items-center justify-between"
-                                onClick={() => handleSelectMedication(index, med)}
-                              >
-                                <div className="flex flex-col">
-                                  {/* Medication Name */}
-                                  <span className="text-sm font-semibold text-gray-700">
-                                    {med.nameOfDrugs}
-                                  </span>
-                                  {/* Dosage Information */}
-                                  <span className="text-xs text-gray-500">
-                                    Dosage: {med.dosage || "N/A"}
-                                  </span>
-                                  {/* Add any other relevant information */}
-                                  <span className="text-xs text-gray-400">
-                                    {med.description || "No description available"}
-                                  </span>
-                                </div>
-                                {/* Additional Actions (optional) */}
-                                <span className="text-xs text-blue-600 hover:underline">
-                                  Select
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                      )}
-
-
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleRemoveMedication(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button variant="outline" onClick={handleAddMedication}>
-                    Add Medication
-                  </Button>
-                </div>
-
-                <Button type="submit" disabled={loading}>
-                  {loading ? <Bars color="#ffffff" height={24} width={24} /> : "Create User"}
+              {/* Medication Section */}
+              <div className="grid gap-2">
+                <Label>Medications</Label>
+                {formData.medications.map((medication, index) => (
+                  <div key={index} className="flex items-center gap-2 relative" ref={wrapperRef}>
+                    <Input
+                      type="text"
+                      placeholder="Medication Name"
+                      value={medication.nameOfDrugs}
+                      onChange={(e) => handleMedicationChange(index, e.target.value)}
+                      required
+                    />
+                    {filteredMedications.length > 0 && (
+                      <ul className="absolute top-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredMedications.map((med) => (
+                          <li
+                            key={med._id}
+                            className="p-4 hover:bg-blue-50 cursor-pointer flex items-center justify-between"
+                            onClick={() => handleSelectMedication(index, med)}
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold text-gray-700">
+                                {med.nameOfDrugs}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                Dosage: {med.dosage || "N/A"}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {med.description || "No description available"}
+                              </span>
+                            </div>
+                            <span className="text-xs text-blue-600 hover:underline">Select</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <Button variant="destructive" onClick={() => handleRemoveMedication(index)}>
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={handleAddMedication}>
+                  Add Medication
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </>
+              </div>
+
+              <Button type="submit" disabled={loading}>
+                {loading ? <Bars color="#ffffff" height={24} width={24} /> : "Create User"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
