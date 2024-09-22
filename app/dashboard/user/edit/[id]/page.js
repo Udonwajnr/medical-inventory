@@ -37,10 +37,10 @@ export default function EditUser() {
     email: "",
     medications: [{ nameOfDrugs: "", id: "" }],
   });
+  
   const [loading, setLoading] = useState(true); // For loading data
   const [submitting, setSubmitting] = useState(false); // For form submission
   const [medicationFocusedIndex, setMedicationFocusedIndex] = useState(null); // Track focused medication input
-
   const wrapperRef = useRef(null);
 
   useEffect(() => {
@@ -54,12 +54,12 @@ export default function EditUser() {
           `https://medical-api-advo.onrender.com/api/user/hospital/${hospitalIdFromLocalStorage}/users/${userId}`
         );
         const userData = userResponse.data;
-
+        console.log(userData.medication)
         // Ensure medications is an array
         setFormData({
           ...userData,
-          medications: Array.isArray(userData.medications)
-            ? userData.medications
+          medications: Array.isArray(userData.medication)
+            ? userData.medication
             : [{ nameOfDrugs: "", id: "" }],
         });
 
@@ -147,9 +147,10 @@ export default function EditUser() {
     setSubmitting(true);
 
     try {
+      const medicationsToSubmit = formData.medications.map(med => med.id);
       const response = await api.put(
         `https://medical-api-advo.onrender.com/api/user/hospital/${hospitalId}/users/${userId}`,
-        formData
+        {...formData, medication: medicationsToSubmit}
       );
       console.log("User updated:", response.data);
       router.push("/dashboard/user");
