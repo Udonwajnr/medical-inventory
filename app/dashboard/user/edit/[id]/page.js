@@ -136,8 +136,9 @@ export default function EditUser() {
 
   const handleQuantityChange = (index, value, isNew = false) => {
     const targetMedications = isNew ? "newMedications" : "medications";
+    const quantityValue = Math.max(1, Number(value)); 
     const updatedMedications = formData[targetMedications].map((medication, i) =>
-      i === index ? { ...medication, quantity: value } : medication
+      i === index ? { ...medication,  quantity: quantityValue } : medication
     );
     setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
   };
@@ -318,7 +319,7 @@ export default function EditUser() {
                                     <Input
                                       type="number"
                                       placeholder="Quantity"
-                                      value={Number(medication.quantity)}
+                                      value={medication.quantity}
                                       onChange={(e) => handleQuantityChange(index, e.target.value)}
                                       required
                                     />
