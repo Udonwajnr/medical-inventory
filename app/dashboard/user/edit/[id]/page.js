@@ -9,7 +9,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import api from "@/app/axios/axiosConfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import {Pill, CheckCircle, XCircle,PlusCircle, Trash2 } from 'lucide-react'
-
+import { Bars } from "react-loader-spinner";
+import { Checkbox } from "@/components/ui/checkbox"
 export default function EditUser() {
   const router = useRouter();
   const { id } = useParams();
@@ -17,7 +18,7 @@ export default function EditUser() {
   const [hospitalId, setHospitalId] = useState("");
   const [medicationsData, setMedicationsData] = useState([]);
   const [filteredMedications, setFilteredMedications] = useState([]);
-  
+  const [userMedication,setUserMedication] = useState([])
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -33,7 +34,6 @@ export default function EditUser() {
  const [activeNewMedicationIndex, setActiveNewMedicationIndex] = useState(null);
  
 
-
   useEffect(() => {
     const fetchUserAndMedications = async () => {
       try {
@@ -42,7 +42,8 @@ export default function EditUser() {
 
         const userResponse = await api.get(`https://medical-api-advo.onrender.com/api/user/hospital/${hospitalIdFromLocalStorage}/users/${userId}`);
         const userData = userResponse.data;
-        console.log(userData)
+        // console.log(userData)
+        setUserMedication(userData.medications)
         setFormData({
           fullName: userData.fullName,
           dateOfBirth: userData.dateOfBirth,
@@ -56,8 +57,8 @@ export default function EditUser() {
                 quantity: Number(med.quantity),
                 startDate: med.startDate || "",
                 endDate: med.endDate || "",
-                remove: false,
                 current: med.current,
+                remove:false
               }))
             : [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "", remove: false, current: true }],
           newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "" }],
@@ -96,12 +97,22 @@ export default function EditUser() {
     setFormData((prev) => ({ ...prev, newMedications: newMedications }));
   };
 
-  const handleRemoveMedication = (index) => {
-    const newMedications = formData.medications.filter((_, i) => i !== index);
-    setFormData((prev) => ({ ...prev, medications: newMedications,remove:true}));
+  // const handleRemoveMedication = (index) => {
+  //   const newMedications = formData.medications.filter((_, i) => i !== index);
+  //   setFormData((prev) => ({ ...prev, medications: newMedications,remove:true}));
   
-  };
+  // };
 
+  const toggleMarkedForRemoval = (index) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      medications: prevState.medications.map((med, i) =>
+        i === index ? { ...med, remove: !med.remove } : med
+      ),
+    }));
+  };
+  
+  
   const handleMedicationChange = (index, value, isNew = false) => {
     const targetMedications = isNew ? "newMedications" : "medications";
     const updatedMedications = formData[targetMedications].map((medication, i) =>
@@ -162,8 +173,8 @@ export default function EditUser() {
         quantity:  Number(medication.quantity),
         startDate: medication.startDate,
         endDate: medication.endDate,
-        // current: medication.current,
-        // remove: medication.remove || false, // Default to false if remove is undefined
+        current: medication.current,
+        remove: medication.remove || false, // Default to false if remove is undefined
       }));
       console.log('Medications Payload:', medicationsPayload);
   
@@ -172,7 +183,7 @@ export default function EditUser() {
         .filter((med) => med.id) // Ensure we only include medications with an ID
         .map((medication) => ({
           medication: medication.id,
-          quantity: medication.quantity || 1, // Default quantity if undefined
+          quantity: Number(medication.quantity) || 1, // Default quantity if undefined
           startDate: medication.startDate || Date.now(), // Default to now if undefined
           endDate: medication.endDate,
           current: true,
@@ -272,7 +283,11 @@ export default function EditUser() {
                       <section aria-labelledby="current-medications-title">
                         <h2 id="current-medications-title" className="text-xl font-semibold mb-4">Current Medications of User</h2>
                         <div className="grid gap-4">
-                          {formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
+                          {userMedication.length === 0
+                          ?
+                           <h2>User Does Not have any Medication</h2>
+                          :
+                          formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
                             <Card key={index}>
                               <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
@@ -280,14 +295,12 @@ export default function EditUser() {
                                     <Pill className="mr-2" />
                                     Medication {index + 1}
                                   </span>
-                                  {/* Optional: Add a remove button here if you want to remove a medication */}
-                                  <div
-                                    size="icon"
-                                    onClick={() => handleRemoveMedication(index)} // Create a remove function
-                                    aria-label={`Remove Medication ${index + 1}`}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </div>
+                                  {/* Optional: Add a remove button here if you want to remove a medication */}                        
+                                  <Checkbox
+                                    id={`${medication.id}`}
+                                    checked={medication.remove}
+                                    onCheckedChange={() => toggleMarkedForRemoval(index)}
+                                  />
                                 </CardTitle>
                               </CardHeader>
                               <CardContent>
@@ -393,7 +406,7 @@ export default function EditUser() {
                       {filteredMedications.map((med) => (
                         <li
                           key={med._id}
-                          className="cursor-pointer p-2 hover:bg-gray-100"
+                          className="cursor-pointer p-2 hover:bg-gray-100 bg-black"
                           onClick={() => handleSelectMedication(index, med, true)}
                         >
                           {med.nameOfDrugs}
