@@ -175,6 +175,7 @@ export default function CreateUser() {
                   placeholder="John Doe"
                   value={formData.fullName}
                   onChange={handleInputChange}
+                 className="capitalize" 
                   required
                 />
               </div>
@@ -283,15 +284,15 @@ export default function CreateUser() {
       {/* Start Date & End Date */}
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col">
-          <Label className="text-sm font-medium text-gray-600">Start Date</Label>
+          <Label className="text-sm font-medium text-gray-600 ">Start Date</Label>
           <Input
-            type="date"
+            type="datetime-local"
             value={medication.startDate || ''}
             onChange={(e) => handleMedicationDateChange(index, 'startDate', e.target.value)}
-            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300 "
           />
         </div>
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <Label className="text-sm font-medium text-gray-600">End Date</Label>
           <Input
             type="date"
@@ -299,7 +300,7 @@ export default function CreateUser() {
             onChange={(e) => handleMedicationDateChange(index, 'endDate', e.target.value)}
             className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Remove Medication Button */}

@@ -287,19 +287,25 @@ export default function EditUser() {
                            <h2>User Does Not have any Medication</h2>
                           :
                           formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
-                            <Card key={index}>
+                            <Card key={index} className={medication.remove ? "border-red-500" : ""}>
                               <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
                                   <span className="flex items-center">
                                     <Pill className="mr-2" />
                                     Medication {index + 1}
                                   </span>
-                                  {/* Optional: Add a remove button here if you want to remove a medication */}                        
-                                  <Checkbox
-                                    id={`${medication.id}`}
-                                    checked={medication.remove}
-                                    onCheckedChange={() => toggleMarkedForRemoval(index)}
-                                  />
+                                  {/* Optional: Add a remove button here if you want to remove a medication */}    
+                                  <div className="flex items-center space-x-2">
+                                                  
+                                    <Checkbox
+                                      id={`${medication.id}`}
+                                      checked={medication.remove}
+                                      onCheckedChange={() => toggleMarkedForRemoval(index)}
+                                    />
+                                    <Label htmlFor={`remove-${medication._id}`} className="text-sm text-muted-foreground">
+                                      Mark for removal
+                                    </Label>
+                                  </div>
                                 </CardTitle>
                               </CardHeader>
                               <CardContent>
@@ -329,6 +335,7 @@ export default function EditUser() {
                                   <div>
                                     <Label>Quantity</Label>
                                     <Input
+                                      min="1"
                                       type="number"
                                       placeholder="Quantity"
                                       value={medication.quantity}
@@ -340,19 +347,20 @@ export default function EditUser() {
                                   <div>
                                   <Label>Start Date</Label>
                                     <Input
-                                      type="date"
+                                      type="datetime-local"
                                       placeholder="Start Date"
-                                      value={medication.startDate ? new Date(medication.startDate).toISOString().slice(0, 10):""}
+                                      value={medication.startDate ? new Date(medication.startDate).toISOString().slice(0, 16):""}
                                       onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value)}
                                     />
                                   </div>
                                   <div>
                                   <Label>End Date</Label>
                                     <Input
-                                      type="date"
+                                      type="datetime-local"
                                       placeholder="End Date"
-                                      value={medication.endDate ? new Date(medication.endDate).toISOString().slice(0, 10) : ""}
+                                      value={medication.endDate ? new Date(medication.endDate).toISOString().slice(0, 16) : ""}
                                       onChange={(e) => handleMedicationDateChange(index, "endDate", e.target.value)}
+                                      disable={true}
                                     />
                                   </div>
                                 </div>
@@ -418,6 +426,7 @@ export default function EditUser() {
                 <div>
                   <Label>Quantity</Label>
                     <Input
+                      min="1"
                       type="number"
                       placeholder="Quantity"
                       value={medication.quantity}
@@ -429,14 +438,14 @@ export default function EditUser() {
                   <div>
                     <Label>Start Date</Label>
                     <Input
-                      type="date"
+                      type="datetime-local"
                       placeholder="Start Date"
                       value={medication.startDate}
                       onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value, true)}
                       // required
                     />
                   </div>
-                  <div>
+                  {/* <div>
                   <Label>End Date</Label>
                     <Input
                       type="date"
@@ -445,7 +454,7 @@ export default function EditUser() {
                       onChange={(e) => handleMedicationDateChange(index, "endDate", e.target.value, true)}
                       // required
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}
