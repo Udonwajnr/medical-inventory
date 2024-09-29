@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import api from "@/app/axios/axiosConfig";
 import { Bars } from "react-loader-spinner";
+import { toast } from "sonner";
 
 export default function CreateUser() {
   const router = useRouter();
@@ -143,7 +144,11 @@ export default function CreateUser() {
           email: formData.email,
           medications: medicationsPayload,
         }
-      );
+      ).then((data)=>{
+          toast("User created Successfully")
+      })
+      
+      ;
       router.push("/dashboard/user");
     } catch (error) {
       console.error("Error creating user:", error);

@@ -216,7 +216,6 @@ export default function EditUser() {
     }
   };
   
-  console.log(formData.medications)
   return (
     <main className="flex-1 overflow-auto p-6">
       <div className="grid gap-6">

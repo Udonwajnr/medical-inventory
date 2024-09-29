@@ -30,7 +30,6 @@ export default function UserDashboard() {
     fetchUsers();
   }, []);
 
-  console.log(hospital)
   return (
     <>
     <div>
@@ -67,7 +66,7 @@ export default function UserDashboard() {
                     <CardHeader className="pb-3">
                         <CardTitle>Users with Medications</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">{hospital?.users?.[0]?.medication?.length}</span>
+                            <span className="text-4xl font-bold">{hospital?.users?.[0]?.medications?.length || 0}</span>
                             <span className="text-muted-foreground">Users currently on medication</span>
                         </CardDescription>
                     </CardHeader>
@@ -103,12 +102,14 @@ export default function UserDashboard() {
                                 <div className="flex items-center gap-2">
                                     <div>
                                         <div className="font-medium">{user.fullName}</div>
-                                        <div className="text-sm text-muted-foreground">{user.created}</div>
+                                        <div className="text-sm text-muted-foreground">{new Date(user.createdAt).toISOString().slice(0, 10)}</div>
                                     </div>
                                 </div>
-                                <Button size="icon" variant="ghost">
-                                    <ExpandIcon className="h-5 w-5" />
-                                </Button>
+                                <Link href={`/dashboard/user/${user._id}`}>
+                                    <Button size="icon" variant="ghost">
+                                        <ExpandIcon className="h-5 w-5" />
+                                    </Button>
+                                </Link>
                             </div>) 
                             })}
                         </div>
