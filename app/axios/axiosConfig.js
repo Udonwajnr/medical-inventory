@@ -36,8 +36,8 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 // Handle refresh token failure (e.g., redirect to login)
                 console.error('Refresh token failed:', refreshError);
-                localStorage.removeItem('accessToken'); // Remove only the access token
                 localStorage.removeItem('_id'); // Remove only the access token
+                localStorage.removeItem('accessToken'); // Remove only the access token
                 window.location.href = '/login';
             }
         }

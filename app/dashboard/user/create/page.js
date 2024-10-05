@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import api from "@/app/axios/axiosConfig";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Bars } from "react-loader-spinner";
 import { toast } from "sonner";
 
@@ -22,7 +23,7 @@ export default function CreateUser() {
     gender: "",
     phoneNumber: "",
     email: "",
-    medications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate:"", endDate:"" }],
+    medications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate:"", endDate:"", custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' } }],
   });
   const wrapperRef = useRef(null);
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,37 @@ export default function CreateUser() {
     setFormData((prev) => ({ ...prev, gender: value }));
   };
 
+  const handleChange = (e, index) => {
+    const { id, value, type, checked } = e.target;
+  
+    setFormData((prevFormData) => {
+      const updatedMedications = [...prevFormData.medications];
+      const currentMedication = updatedMedications[index];
+  
+      if (id.includes('frequency') || id.includes('duration')) {
+        // Split the id into field and subfield (e.g., frequencyValue, frequencyUnit)
+        const [field, subField] = id.split(/(?=[A-Z])/);
+        currentMedication[`custom${capitalizeFirstLetter(field)}`] = {
+          ...currentMedication[`custom${capitalizeFirstLetter(field)}`],
+          [subField.toLowerCase()]: value,
+        };
+      } else if (id === 'customDosage') {
+        // For custom dosage
+        currentMedication.customDosage = value;
+      } else {
+        // For other general fields
+        currentMedication[id] = type === 'checkbox' ? checked : value;
+      }
+  
+      return { ...prevFormData, medications: updatedMedications };
+    });
+  };
+  
+  // Helper function to capitalize the first letter
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+  
   // Add new medication field
   const handleAddMedication = () => {
     setFormData((prev) => ({
@@ -122,6 +154,15 @@ export default function CreateUser() {
   setFormData((prev) => ({ ...prev, medications: newMedications }));
   };
 
+
+  const handleCustomToggle = (index) => {
+    const newMedications = formData.medications.map((medication, i) =>
+      i === index ? { ...medication, custom: !medication.custom } : medication
+    );
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -132,6 +173,10 @@ export default function CreateUser() {
         quantity: medication.quantity,
         startDate: medication.startDate || Date.now(),
         endDate: medication.endDate || null, // Optional end date
+        custom: medication.custom,
+        customDosage: medication.custom ? medication.customDosage : undefined,
+        customFrequency: medication.custom ? medication.customFrequency : undefined,
+        customDuration: medication.custom ? medication.customDuration : undefined,
       }));
 
       const response = await api.post(
@@ -146,9 +191,7 @@ export default function CreateUser() {
         }
       ).then((data)=>{
           toast("User created Successfully")
-      })
-      
-      ;
+      });
       router.push("/dashboard/user");
     } catch (error) {
       console.error("Error creating user:", error);
@@ -291,16 +334,79 @@ export default function CreateUser() {
             onChange={(e) => handleMedicationDateChange(index, 'startDate', e.target.value)}
             className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300 "
           />
-        </div>
-        {/* <div className="flex flex-col">
-          <Label className="text-sm font-medium text-gray-600">End Date</Label>
-          <Input
-            type="date"
-            value={medication.endDate || ''}
-            onChange={(e) => handleMedicationDateChange(index, 'endDate', e.target.value)}
-            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
-        </div> */}
+        </div>        
+      </div>
+      
+      {/* custom  */}
+      <div>
+       <div className="flex items-center mb-3">
+                    <Checkbox
+                      id={`${medication.id}`}
+                      checked={medication.custom}
+                      onCheckedChange={() => handleCustomToggle(index)}
+                      className="mr-2"
+                    />
+                    <Label>Custom Medication</Label>
+                  </div>
+
+                  {/* Custom Medication Fields */}
+                  {medication.custom && (
+                    <div className="grid gap-4">
+                      <Input
+                        placeholder="Custom Dosage"
+                        value={medication.customDosage}
+                        onChange={(e) => handleChange({ target: { id: 'customDosage', value: e.target.value } }, index)}
+                      />
+
+                      {/* Custom Frequency */}
+                      <div className="flex items-center space-x-4">
+                        <Input
+                          id="frequencyValue"
+                          type="number"
+                          placeholder="6"
+                          value={medication.customFrequency.value}
+                          min="0"
+                          onChange={(e) => handleChange(e, index)}
+                        />
+                        <Select
+                          value={medication.customFrequency.unit}
+                          onValueChange={(value) => handleChange({ target: { id: 'frequencyUnit', value } }, index)}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Hours" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hours">Hours</SelectItem>
+                            <SelectItem value="days">Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Custom Duration */}
+                      <div className="flex items-center space-x-4">
+                        <Input
+                          id="durationValue"
+                          type="number"
+                          placeholder="7"
+                          value={medication.customDuration.value}
+                          min="0"
+                          onChange={(e) => handleChange(e, index)}
+                        />
+                        <Select
+                          value={medication.customDuration.unit}
+                          onValueChange={(value) => handleChange({ target: { id: 'durationUnit', value } }, index)}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Days" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="days">Days</SelectItem>
+                            <SelectItem value="weeks">Weeks</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
       </div>
 
       {/* Remove Medication Button */}
