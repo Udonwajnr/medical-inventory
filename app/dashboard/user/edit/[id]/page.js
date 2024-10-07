@@ -177,14 +177,16 @@ export default function EditUser() {
     setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
   };
 
-  const handleCustomFieldChange = (index, field, value, isNew = false) => {
-    const targetMedications = isNew ? "newMedications" : "medications";
-    
-    const updatedMedications = formData[targetMedications].map((medication, i) =>
-      i === index ? { ...medication, [field]: value } : medication
-    );
-    
-    setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
+  const toggleNewMedicationCustomField = (index) => {
+    setFormData((prevFormData) => {
+      const updatedNewMedications = prevFormData.newMedications.map((medication, medIndex) => {
+        if (medIndex === index) {
+          return { ...medication, custom: !medication.custom };
+        }
+        return medication;
+      });
+      return { ...prevFormData, newMedications: updatedNewMedications };
+    });
   };
   
   // Function to toggle the custom field
@@ -332,7 +334,6 @@ export default function EditUser() {
                            <h2>User Does Not have any Medication</h2>
                           :
                           formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
-                            
                             <>
                               <Card key={index} className={medication.remove ? "border-red-500" : ""}>
                                 <CardHeader>
@@ -438,7 +439,6 @@ export default function EditUser() {
                                     <div className="mt-2">
                                       <Label>Custom Frequency</Label>
                                       <div className="flex gap-2">
-
                                         <Input
                                           placeholder="Custom Frequency"
                                           value={medication.customFrequency.value}
@@ -504,68 +504,135 @@ export default function EditUser() {
             <CardDescription>Please fill in the details of the new medication</CardDescription>
           </CardHeader>
           <CardContent>
-            {formData.newMedications.map((medication, index) => (
-              <div key={index} className="grid gap-4 mb-4">
-                  <div className="flex justify-between items-center">
-                      <Label>New Medication {index + 1}</Label>
-                      <div
-                          size="icon"
-                          onClick={() => handleRemoveNewMedication(index)} // Create a remove function
-                          aria-label={`Remove Medication ${index + 1}`}
-                          className="cursor-pointer"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </div>
-                  </div>
-                <div className="flex gap-2 relative">
-                  <Input
-                    placeholder="New Medication Name"
-                    onFocus={() => setActiveNewMedicationIndex(index)} // Set active index on focus
-                    onBlur={() => setTimeout(() => setActiveNewMedicationIndex(null), 200)} // Clear the active index after blur (with a delay)
-                    value={medication.nameOfDrugs}
-                    onChange={(e) => handleMedicationChange(index, e.target.value, true)}
-                    // required
-                  />
-                  
-                  {filteredMedications.length > 0 && activeNewMedicationIndex === index &&(
-                    <ul className="absolute top-14 border-gray-300 shadow-lg max-h-60 bg-white border rounded-lg w-full overflow-y-auto">
-                      {filteredMedications.map((med) => (
-                        <li
-                          key={med._id}
-                          className="cursor-pointer p-2 hover:bg-gray-100 bg-black"
-                          onClick={() => handleSelectMedication(index, med, true)}
-                        >
-                          {med.nameOfDrugs}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                <div>
-                  <Label>Quantity</Label>
-                    <Input
-                      min="1"
-                      type="number"
-                      placeholder="Quantity"
-                      value={medication.quantity}
-                      onChange={(e) => handleQuantityChange(index, e.target.value, true)}
-                    />
-                </div>
+          {formData.newMedications.map((medication, index) => (
+  <div key={index} className="grid gap-4 mb-4">
+    <div className="flex justify-between items-center">
+      <Label>New Medication {index + 1}</Label>
+      <div
+        size="icon"
+        onClick={() => handleRemoveNewMedication(index)} // Create a remove function
+        aria-label={`Remove Medication ${index + 1}`}
+        className="cursor-pointer"
+      >
+        <Trash2 className="h-5 w-5" />
+      </div>
+    </div>
 
-                  <div>
-                    <Label>Start Date</Label>
-                    <Input
-                      type="datetime-local"
-                      placeholder="Start Date"
-                      value={medication.startDate}
-                      onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value, true)}
-                      // required
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+    <div className="flex gap-2 relative">
+      <Input
+        placeholder="New Medication Name"
+        onFocus={() => setActiveNewMedicationIndex(index)} // Set active index on focus
+        onBlur={() => setTimeout(() => setActiveNewMedicationIndex(null), 200)} // Clear the active index after blur (with a delay)
+        value={medication.nameOfDrugs}
+        onChange={(e) => handleMedicationChange(index, e.target.value, true)}
+      />
+      
+      {filteredMedications.length > 0 && activeNewMedicationIndex === index && (
+        <ul className="absolute top-14 border-gray-300 shadow-lg max-h-60 bg-white border rounded-lg w-full overflow-y-auto">
+          {filteredMedications.map((med) => (
+            <li
+              key={med._id}
+              className="cursor-pointer p-2 hover:bg-gray-100"
+              onClick={() => handleSelectMedication(index, med, true)}
+            >
+              {med.nameOfDrugs}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    <div className="flex gap-2">
+      <div>
+        <Label>Quantity</Label>
+        <Input
+          min="1"
+          type="number"
+          placeholder="Quantity"
+          value={medication.quantity}
+          onChange={(e) => handleQuantityChange(index, e.target.value, true)}
+        />
+      </div>
+
+      <div>
+        <Label>Start Date</Label>
+        <Input
+          type="datetime-local"
+          placeholder="Start Date"
+          value={medication.startDate}
+          onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value, true)}
+        />
+      </div>
+    </div>
+
+    {/* Checkbox for toggling custom fields */}
+    <Checkbox
+      checked={medication.custom}
+      onCheckedChange={() => toggleNewMedicationCustomField(index)}
+    />
+    <Label className="text-sm text-muted-foreground">Custom Settings</Label>
+
+    {/* Render custom fields if custom is true */}
+    {medication.custom && (
+      <div className="custom-fields grid gap-2">
+        <Input
+          placeholder="Custom Dosage"
+          value={medication.customDosage}
+          onChange={(e) => handleCustomChange(index, "customDosage", e.target.value, true)}
+        />
+        <div>
+            <Label>Custom Frequency</Label>
+            <div className="flex">
+
+            <Input
+              placeholder="Custom Frequency Value"
+              value={medication.customFrequency.value}
+              onChange={(e) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, value: e.target.value }, true)}
+            />
+            <Select
+              value={medication.customFrequency.unit}
+              onChange={(value) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, unit: value }, true)}
+            >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Hours" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="hours">Hours</SelectItem>
+                <SelectItem value="days">Days</SelectItem>
+          </SelectContent>
+            </Select>
+            </div>
+        </div>
+        <div>
+          <Label>
+            Custom Duration
+          </Label>
+            <div className="flex">
+              <Input
+                placeholder="Custom Duration Value"
+                value={medication.customDuration.value}
+                onChange={(e) => handleCustomChange(index, "customDuration", { ...medication.customDuration, value: e.target.value }, true)}
+              />
+              <Select
+                value={medication.customDuration.unit}
+                onChange={(value) => handleCustomChange(index, "customDuration", { ...medication.customDuration, unit: value }, true)}
+              >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Days" />
+             </SelectTrigger>
+
+                 <SelectContent>
+                    <SelectItem value="days">Days</SelectItem>
+                    <SelectItem value="weeks">Weeks</SelectItem>
+                  </SelectContent>
+              </Select>
+            </div>
+        </div>
+      </div>
+    )}
+  </div>
+    ))}
+
             <Button type="button" onClick={handleAddNewMedication} className="w-full">
               Add New Medication
             </Button>
