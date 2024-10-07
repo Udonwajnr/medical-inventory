@@ -25,15 +25,27 @@ export default function EditUser() {
     gender: "",
     phoneNumber: "",
     email: "",
-    medications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "", remove: false, current: true }],
-    newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "" }],
+    medications: [{
+      nameOfDrugs: "", 
+      id: "", 
+      quantity: 1, 
+      startDate: "", 
+      endDate: "", 
+      remove: false, 
+      current: true, 
+      custom: false, 
+      customDosage: "", 
+      customFrequency: { value: '', unit: 'hours' }, 
+      customDuration: { value: '', unit: 'days' }
+    }],
+    newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "" ,custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' }}],
   });
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+ const [loading, setLoading] = useState(true);
+ const [submitting, setSubmitting] = useState(false);
  const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
  const [activeNewMedicationIndex, setActiveNewMedicationIndex] = useState(null);
- 
 
+ 
   useEffect(() => {
     const fetchUserAndMedications = async () => {
       try {
@@ -42,7 +54,7 @@ export default function EditUser() {
 
         const userResponse = await api.get(`https://medical-api-advo.onrender.com/api/user/hospital/${hospitalIdFromLocalStorage}/users/${userId}`);
         const userData = userResponse.data;
-        // console.log(userData)
+        console.log(userData)
         setUserMedication(userData.medications)
         setFormData({
           fullName: userData.fullName,
@@ -58,10 +70,13 @@ export default function EditUser() {
                 startDate: med.startDate || "",
                 endDate: med.endDate || "",
                 current: med.current,
-                remove:false
-              }))
-            : [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "", remove: false, current: true }],
-          newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "" }],
+                remove:false,
+                current: true,
+                custom: med.custom, customDosage:med.customDosage,
+                customFrequency: { value: med.customFrequency.value, unit: med.customFrequency.unit },
+                customDuration: { value: med.customDuration.value, unit: med.customDuration.unit }
+              })) : [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "", remove: false, current: true,custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' } }],
+          newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "",custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' }}],
         });
 
         const medicationResponse = await api.get(`https://medical-api-advo.onrender.com/api/medication/${hospitalIdFromLocalStorage}/medications`);
@@ -77,9 +92,9 @@ export default function EditUser() {
   }, [userId]);
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
+      const { id, value } = e.target;
+      setFormData((prev) => ({ ...prev, [id]: value }));
+    };
 
   const handleGenderChange = (value) => {
     setFormData((prev) => ({ ...prev, gender: value }));
@@ -97,12 +112,6 @@ export default function EditUser() {
     setFormData((prev) => ({ ...prev, newMedications: newMedications }));
   };
 
-  // const handleRemoveMedication = (index) => {
-  //   const newMedications = formData.medications.filter((_, i) => i !== index);
-  //   setFormData((prev) => ({ ...prev, medications: newMedications,remove:true}));
-  
-  // };
-
   const toggleMarkedForRemoval = (index) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -111,7 +120,6 @@ export default function EditUser() {
       ),
     }));
   };
-  
   
   const handleMedicationChange = (index, value, isNew = false) => {
     const targetMedications = isNew ? "newMedications" : "medications";
@@ -143,7 +151,6 @@ export default function EditUser() {
     setFilteredMedications([]);
     console.log(`Selected Medication for index ${index}:`, selectedMedication); // Log for debugging
   };
-  
 
   const handleQuantityChange = (index, value, isNew = false) => {
     const targetMedications = isNew ? "newMedications" : "medications";
@@ -162,37 +169,77 @@ export default function EditUser() {
     setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
   };
 
+  const handleCustomChange = (index, field, value, isNew = false) => {
+    const targetMedications = isNew ? "newMedications" : "medications";
+    const updatedMedications = formData[targetMedications].map((medication, i) =>
+      i === index ? { ...medication, [field]: value } : medication
+    );
+    setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
+  };
+
+  const handleCustomFieldChange = (index, field, value, isNew = false) => {
+    const targetMedications = isNew ? "newMedications" : "medications";
+    
+    const updatedMedications = formData[targetMedications].map((medication, i) =>
+      i === index ? { ...medication, [field]: value } : medication
+    );
+    
+    setFormData((prev) => ({ ...prev, [targetMedications]: updatedMedications }));
+  };
+  
+  // Function to toggle the custom field
+  const toggleCustomField = (index) => {
+    setFormData((prevFormData) => {
+      const updatedMedications = prevFormData.medications.map((medication, medIndex) => {
+        if (medIndex === index) {
+          return { ...medication, custom: !medication.custom }; // Toggle the custom field
+        }
+        return medication;
+      });
+      return { ...prevFormData, medications: updatedMedications };
+    });
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
   
     try {
-      // Construct medicationsPayload
+      // Handle regular medications
       const medicationsPayload = formData.medications.map((medication) => ({
         medication: medication.id,
-        quantity:  Number(medication.quantity),
+        quantity: Number(medication.quantity),
         startDate: medication.startDate,
         endDate: medication.endDate,
         current: medication.current,
-        remove: medication.remove || false, // Default to false if remove is undefined
+        remove: medication.remove || false,
+        custom: medication.custom, // Pass the custom flag
+        customDosage: medication.custom ? medication.customDosage : undefined,
+        customFrequency: medication.custom ? medication.customFrequency : undefined,
+        customDuration: medication.custom ? medication.customDuration : undefined,
       }));
-      console.log('Medications Payload:', medicationsPayload);
   
-      // Construct newMedicationsPayload
+      // Handle new medications
       const newMedicationsPayload = formData.newMedications
-        .filter((med) => med.id) // Ensure we only include medications with an ID
+        .filter((med) => med.id) // Only include medications with an ID
         .map((medication) => ({
           medication: medication.id,
-          quantity: Number(medication.quantity) || 1, // Default quantity if undefined
-          startDate: medication.startDate || Date.now(), // Default to now if undefined
+          quantity: Number(medication.quantity) || 1,
+          startDate: medication.startDate || Date.now(),
           endDate: medication.endDate,
           current: true,
-          remove: medication.remove || false, // Default to false if remove is undefined
+          remove: medication.remove || false,
+          custom: medication.custom, // Pass the custom flag
+          customDosage: medication.custom ? medication.customDosage : undefined,
+          customFrequency: medication.custom ? medication.customFrequency : undefined,
+          customDuration: medication.custom ? medication.customDuration : undefined,
         }));
   
+      console.log('Medications Payload:', medicationsPayload);
       console.log('New Medications Payload:', newMedicationsPayload);
   
-      // Send PUT request
+      // Send PUT request with both medications and newMedications
       const response = await api.put(`https://medical-api-advo.onrender.com/api/user/hospital/${hospitalId}/users/${userId}`, {
         fullName: formData.fullName,
         dateOfBirth: formData.dateOfBirth,
@@ -202,10 +249,9 @@ export default function EditUser() {
         medications: medicationsPayload,
         newMedications: newMedicationsPayload,
       });
-      
+  
       console.log('Response:', response);
   
-      // Redirect on success
       if (response.status === 200) {
         router.push("/dashboard/user");
       }
@@ -276,7 +322,6 @@ export default function EditUser() {
                   <Input id="email" type="email" value={formData.email} onChange={handleInputChange} required />
                 </div>
 
-
                 <div className="grid md:grid-cols-2 gap-6">
                      {/* Existing Medications */}
                       <section aria-labelledby="current-medications-title">
@@ -287,97 +332,171 @@ export default function EditUser() {
                            <h2>User Does Not have any Medication</h2>
                           :
                           formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
-                            <Card key={index} className={medication.remove ? "border-red-500" : ""}>
-                              <CardHeader>
-                                <CardTitle className="flex items-center justify-between">
-                                  <span className="flex items-center">
-                                    <Pill className="mr-2" />
-                                    Medication {index + 1}
-                                  </span>
-                                  {/* Optional: Add a remove button here if you want to remove a medication */}    
-                                  <div className="flex items-center space-x-2">
-                                                  
-                                    <Checkbox
-                                      id={`${medication.id}`}
-                                      checked={medication.remove}
-                                      onCheckedChange={() => toggleMarkedForRemoval(index)}
-                                    />
-                                    <Label htmlFor={`remove-${medication._id}`} className="text-sm text-muted-foreground">
-                                      Mark for removal
-                                    </Label>
-                                  </div>
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="flex gap-2 mb-4">
-                                  <Input
-                                    placeholder="Medication Name"
-                                    value={medication.nameOfDrugs}
-                                    onFocus={() => setActiveMedicationIndex(index)} // Set active index on focus
-                                    onBlur={() => setTimeout(() => setActiveMedicationIndex(null), 200)} // Clear the active index after blur (with a delay)
-                                    onChange={(e) => handleMedicationChange(index, e.target.value)}
-                                  />
-                                  {filteredMedications.length > 0 && activeMedicationIndex === index &&(
-                                    <ul className="bg-white border rounded-lg w-full">
-                                      {filteredMedications.map((med) => (
-                                        <li
-                                          key={med._id}
-                                          className="cursor-pointer p-2 hover:bg-gray-100"
-                                          onClick={() => handleSelectMedication(index,med)}
-                                        >
-                                          {med.nameOfDrugs}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  )}
-                                </div>
-                                <div className="flex gap-2 mb-4">
-                                  <div>
-                                    <Label>Quantity</Label>
+                            
+                            <>
+                              <Card key={index} className={medication.remove ? "border-red-500" : ""}>
+                                <CardHeader>
+                                  <CardTitle className="flex items-center justify-between">
+                                    <span className="flex items-center">
+                                      <Pill className="mr-2" />
+                                      Medication {index + 1}
+                                    </span>
+                                    {/* Optional: Add a remove button here if you want to remove a medication */}    
+                                    <div className="flex items-center space-x-2"> 
+                                      <Checkbox
+                                        id={`${medication.id}`}
+                                        checked={medication.remove}
+                                        onCheckedChange={() => toggleMarkedForRemoval(index)}
+                                      />
+                                      <Label htmlFor={`remove-${medication._id}`} className="text-sm text-muted-foreground">
+                                        Mark for removal
+                                      </Label>
+                                    </div>
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="flex gap-2 mb-4">
                                     <Input
-                                      min="1"
-                                      type="number"
-                                      placeholder="Quantity"
-                                      value={medication.quantity}
-                                      onChange={(e) => handleQuantityChange(index, e.target.value)}
-                                      required
+                                      placeholder="Medication Name"
+                                      value={medication.nameOfDrugs}
+                                      onFocus={() => setActiveMedicationIndex(index)} // Set active index on focus
+                                      onBlur={() => setTimeout(() => setActiveMedicationIndex(null), 200)} // Clear the active index after blur (with a delay)
+                                      onChange={(e) => handleMedicationChange(index, e.target.value)}
                                     />
+                                    {filteredMedications.length > 0 && activeMedicationIndex === index &&(
+                                      <ul className="bg-white border rounded-lg w-full">
+                                        {filteredMedications.map((med) => (
+                                          <li
+                                            key={med._id}
+                                            className="cursor-pointer p-2 hover:bg-gray-100"
+                                            onClick={() => handleSelectMedication(index,med)}
+                                          >
+                                            {med.nameOfDrugs}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
                                   </div>
+                                  <div className="flex gap-2 mb-4">
+                                    <div>
+                                      <Label>Quantity</Label>
+                                      <Input
+                                        min="1"
+                                        type="number"
+                                        placeholder="Quantity"
+                                        value={medication.quantity}
+                                        onChange={(e) => handleQuantityChange(index, e.target.value)}
+                                        required
+                                      />
+                                    </div>
 
-                                  <div>
-                                  <Label>Start Date</Label>
-                                    <Input
-                                      type="datetime-local"
-                                      placeholder="Start Date"
-                                      value={medication.startDate ? new Date(medication.startDate).toISOString().slice(0, 16):""}
-                                      onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value)}
-                                    />
+                                    <div>
+                                    <Label>Start Date</Label>
+                                      <Input
+                                        type="datetime-local"
+                                        placeholder="Start Date"
+                                        value={medication.startDate ? new Date(medication.startDate).toISOString().slice(0, 16):""}
+                                        onChange={(e) => handleMedicationDateChange(index, "startDate", e.target.value)}
+                                      />
+                                    </div>
+                                    <div>
+                                    <Label>End Date</Label>
+                                      <Input
+                                        type="datetime-local"
+                                        placeholder="End Date"
+                                        value={medication.endDate ? new Date(medication.endDate).toISOString().slice(0, 16) : ""}
+                                        onChange={(e) => handleMedicationDateChange(index, "endDate", e.target.value)}
+                                        disable={true}
+                                      />
+                                    </div>
                                   </div>
-                                  <div>
-                                  <Label>End Date</Label>
+                                  <span>Status: {medication.current ? 
+                                    <span className="text-green-600 flex items-center"><CheckCircle className="w-4 h-4 mr-1" />On Current Medication</span> : 
+                                    <span className="text-red-600 flex items-center"><XCircle className="w-4 h-4 mr-1" /> Not on Current Medication</span>}
+                                  </span>
+                                  
+                                  {/* Custom Medication */}
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Label className="text-xl">Add Custom Medication</Label>
+                                    <Checkbox
+                                    checked={medication.custom}
+                                    onCheckedChange={() => toggleCustomField(index)}
+                                  />
+
+                                  </div>
+                                {medication.custom &&(
+                                  <div className="custom-fields">
+                                    <div className="mt-2">
+                                        <Label>Custom Dosage</Label>
+                                        <Input
+                                          placeholder="Custom Dosage"
+                                          value={medication.customDosage}
+                                          onChange={(e) => handleCustomChange(index, "customDosage", e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="mt-2">
+                                      <Label>Custom Frequency</Label>
+                                      <div className="flex gap-2">
+
+                                        <Input
+                                          placeholder="Custom Frequency"
+                                          value={medication.customFrequency.value}
+                                          onChange={(e) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, value: e.target.value })}
+                                        />
+                                        <Select
+                                          value={medication.customFrequency.unit}
+                                          onValueChange={(value) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, unit: value })}
+                                        >
+                                          <SelectTrigger className="w-[180px]">
+                                              <SelectValue placeholder="Hours" />
+                                        </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="hours">Hours</SelectItem>
+                                            <SelectItem value="days">Days</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    </div>
+
+                                <div className="mt-2 gap-2">
+                                  <Label>
+                                      Custom Duration
+                                  </Label>
+              
+                                  <div className="flex ">
                                     <Input
-                                      type="datetime-local"
-                                      placeholder="End Date"
-                                      value={medication.endDate ? new Date(medication.endDate).toISOString().slice(0, 16) : ""}
-                                      onChange={(e) => handleMedicationDateChange(index, "endDate", e.target.value)}
-                                      disable={true}
+                                      placeholder="Custom Duration"
+                                      value={medication.customDuration.value}
+                                      onChange={(e) => handleCustomChange(index, "customDuration", { ...medication.customDuration, value: e.target.value })}
                                     />
+                                    <Select
+                                      value={medication.customDuration.unit}
+                                      onValueChange={(value) => handleCustomChange(index, "customDuration", { ...medication.customDuration, unit: value })}
+                                    >
+                                      <SelectTrigger className="w-[180px]">
+                                          <SelectValue placeholder="Days" />
+                                    </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="days">Days</SelectItem>
+                                        <SelectItem value="weeks">Weeks</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+
                                   </div>
                                 </div>
-                                <span>Status: {medication.current ? 
-                                  <span className="text-green-600 flex items-center"><CheckCircle className="w-4 h-4 mr-1" />On Current Medication</span> : 
-                                  <span className="text-red-600 flex items-center"><XCircle className="w-4 h-4 mr-1" /> Not on Current Medication</span>}
-                                </span>
-                              </CardContent>
-                            </Card>
-                          ))}
+                                  </div>
+                                )}
+                                </CardContent>
+                              </Card>
+                            </>
+                          ))
+                          
+                          }
                         </div>
                       </section>
-                
-                
-                
-                    {/* New Medications */}
-                    <section aria-labelledby="add-medication-title">
+    {/* New Medications */}
+     <section aria-labelledby="add-medication-title">
         <h2 id="add-medication-title" className="text-xl font-semibold mb-4">Purchase New Medication</h2>
         <Card>
           <CardHeader>
@@ -431,7 +550,6 @@ export default function EditUser() {
                       placeholder="Quantity"
                       value={medication.quantity}
                       onChange={(e) => handleQuantityChange(index, e.target.value, true)}
-                      // required
                     />
                 </div>
 
@@ -445,16 +563,6 @@ export default function EditUser() {
                       // required
                     />
                   </div>
-                  {/* <div>
-                  <Label>End Date</Label>
-                    <Input
-                      type="date"
-                      placeholder="End Date"
-                      value={medication.endDate}
-                      onChange={(e) => handleMedicationDateChange(index, "endDate", e.target.value, true)}
-                      // required
-                    />
-                  </div> */}
                 </div>
               </div>
             ))}
