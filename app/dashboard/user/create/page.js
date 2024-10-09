@@ -166,7 +166,6 @@ export default function CreateUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const medicationsPayload = formData.medications.map((medication) => ({
         medication: medication.id,
@@ -199,6 +198,8 @@ export default function CreateUser() {
       setLoading(false);
     }
   };
+
+  console.log(formData)
 
   return (
     <main className="flex-1 overflow-auto p-6">
@@ -346,20 +347,31 @@ export default function CreateUser() {
                       onCheckedChange={() => handleCustomToggle(index)}
                       className="mr-2"
                     />
-                    <Label>Custom Medication</Label>
+                    <Label> Add Custom Medication</Label>
                   </div>
 
                   {/* Custom Medication Fields */}
                   {medication.custom && (
                     <div className="grid gap-4">
-                      <Input
-                        placeholder="Custom Dosage"
-                        value={medication.customDosage}
-                        onChange={(e) => handleChange({ target: { id: 'customDosage', value: e.target.value } }, index)}
-                      />
+                      
+                      <div>
+                      <Label>
+                        Custom Duration
+                      </Label>
+                      
+                        <Input
+                          placeholder="Custom Dosage"
+                          value={medication.customDosage}
+                          onChange={(e) => handleChange({ target: { id: 'customDosage', value: e.target.value } }, index)}
+                        />
+                      </div>
 
                       {/* Custom Frequency */}
-                      <div className="flex items-center space-x-4">
+                      <div>
+                      <Label>
+                        Custom Frequency
+                      </Label>
+                      <div className="flex">
                         <Input
                           id="frequencyValue"
                           type="number"
@@ -380,30 +392,37 @@ export default function CreateUser() {
                             <SelectItem value="days">Days</SelectItem>
                           </SelectContent>
                         </Select>
+                        </div>
                       </div>
 
                       {/* Custom Duration */}
-                      <div className="flex items-center space-x-4">
-                        <Input
-                          id="durationValue"
-                          type="number"
-                          placeholder="7"
-                          value={medication.customDuration.value}
-                          min="0"
-                          onChange={(e) => handleChange(e, index)}
-                        />
-                        <Select
-                          value={medication.customDuration.unit}
-                          onValueChange={(value) => handleChange({ target: { id: 'durationUnit', value } }, index)}
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Days" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="days">Days</SelectItem>
-                            <SelectItem value="weeks">Weeks</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div >
+                      <Label>
+                        Custom Duration
+                      </Label>
+
+                      <div className="flex">
+                          <Input
+                            id="durationValue"
+                            type="number"
+                            placeholder="7"
+                            value={medication.customDuration.value}
+                            min="0"
+                            onChange={(e) => handleChange(e, index)}
+                          />
+                          <Select
+                            value={medication.customDuration.unit}
+                            onValueChange={(value) => handleChange({ target: { id: 'durationUnit', value } }, index)}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Days" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="days">Days</SelectItem>
+                              <SelectItem value="weeks">Weeks</SelectItem>
+                            </SelectContent>
+                          </Select>
+                       </div> 
                       </div>
                     </div>
                   )}

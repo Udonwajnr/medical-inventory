@@ -43,8 +43,8 @@ export default function EditUser() {
  const [loading, setLoading] = useState(true);
  const [submitting, setSubmitting] = useState(false);
  const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
+ const [userExist,setUserExist] = useState(null)
  const [activeNewMedicationIndex, setActiveNewMedicationIndex] = useState(null);
-
  
   useEffect(() => {
     const fetchUserAndMedications = async () => {
@@ -360,8 +360,7 @@ export default function EditUser() {
                           ?
                            <h2>User Does Not have any Medication</h2>
                           :
-                          formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
-                            
+                          formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (   
                             <>
                               <Card key={index} className={medication.remove ? "border-red-500" : ""}>
                                 <CardHeader>
@@ -373,7 +372,7 @@ export default function EditUser() {
                                     {/* Optional: Add a remove button here if you want to remove a medication */}    
                                     <div className="flex items-center space-x-2"> 
                                       <Checkbox
-                                        id={`${medication.id}`}
+                                        id={`${medication._id}`}
                                         checked={medication.remove}
                                         onCheckedChange={() => toggleMarkedForRemoval(index)}
                                       />
@@ -446,7 +445,7 @@ export default function EditUser() {
                                   
                                   {/* Custom Medication */}
                                   <div className="flex items-center gap-2 mt-2">
-                                    <Label className="text-xl">Add Custom Medication</Label>
+                                    <Label className="text-sm text-muted-foreground">Custom Medication</Label>
                                     <Checkbox
                                     checked={medication.custom}
                                     onCheckedChange={() => toggleCustomField(index)}
@@ -510,7 +509,6 @@ export default function EditUser() {
                                         <SelectItem value="weeks">Weeks</SelectItem>
                                       </SelectContent>
                                     </Select>
-
                                   </div>
                                 </div>
                                   </div>
@@ -594,11 +592,13 @@ export default function EditUser() {
     </div>
 
     {/* Checkbox for toggling custom fields */}
-    <Checkbox
-      checked={medication.custom}
-      onCheckedChange={() => toggleNewMedicationCustomField(index)}
-    />
-    <Label className="text-sm text-muted-foreground">Custom Settings</Label>
+    <div className="flex gap-2">
+      <Checkbox
+        checked={medication.custom}
+        onCheckedChange={() => toggleNewMedicationCustomField(index)}
+      />
+      <Label className="text-sm text-muted-foreground">Add Custom Medication</Label>
+    </div>
 
     {/* Render custom fields if custom is true */}
     {medication.custom && (
@@ -619,7 +619,7 @@ export default function EditUser() {
             />
             <Select
               value={medication.customFrequency.unit}
-              onChange={(value) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, unit: value }, true)}
+              onValueChange={(value) => handleCustomChange(index, "customFrequency", { ...medication.customFrequency, unit: value }, true)}
             >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Hours" />
@@ -643,7 +643,7 @@ export default function EditUser() {
               />
               <Select
                 value={medication.customDuration.unit}
-                onChange={(value) => handleCustomChange(index, "customDuration", { ...medication.customDuration, unit: value }, true)}
+                onValueChange={(value) => handleCustomChange(index, "customDuration", { ...medication.customDuration, unit: value }, true)}
               >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Days" />
@@ -669,7 +669,7 @@ export default function EditUser() {
                     </section>
                 </div>
 
-                <Button type="submit" className="mt-6">
+                <Button type="submit" className="mt-6" disable={submitting ? true : false}>
                   {submitting ? "Submitting..." : "Submit"}
                 </Button>
               </form>
