@@ -9,7 +9,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import api from "@/app/axios/axiosConfig";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Bars } from "react-loader-spinner";
-import { toast } from "sonner";
+import { Toaster, toast } from 'sonner'
 
 export default function CreateUser() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function CreateUser() {
   const [medicationsData, setMedicationsData] = useState([]); // All medications from the API
   const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
   const [filteredMedications, setFilteredMedications] = useState([]); // Medications filtered by input
+  const [userErrorMessage,setUserErrorMessage] = useState([])
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -189,11 +190,14 @@ export default function CreateUser() {
           medications: medicationsPayload,
         }
       ).then((data)=>{
-          toast("User created Successfully")
+          toast.success("User created Successfully",{duration: 5000,})
       });
       router.push("/dashboard/user");
     } catch (error) {
       console.error("Error creating user:", error);
+      setUserErrorMessage(error.response.data)
+      toast.error(error.response.data.message, {duration: 5000,})
+
     } finally {
       setLoading(false);
     }
@@ -358,7 +362,7 @@ export default function CreateUser() {
                       <Label>
                         Custom Duration
                       </Label>
-                      
+
                         <Input
                           placeholder="Custom Dosage"
                           value={medication.customDosage}
