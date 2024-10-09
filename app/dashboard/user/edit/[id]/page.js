@@ -64,6 +64,7 @@ export default function EditUser() {
           email: userData.email,
           medications: Array.isArray(userData.medications)
             ? userData.medications.map((med) => ({
+                _id:med._id,
                 nameOfDrugs: med.medication.nameOfDrugs,
                 id: med.medication._id,
                 quantity: Number(med.quantity),
@@ -72,15 +73,19 @@ export default function EditUser() {
                 current: med.current,
                 remove:false,
                 current: true,
-                custom: med.custom, customDosage:med.customDosage,
-                customFrequency: { value: med.customFrequency.value, unit: med.customFrequency.unit },
-                customDuration: { value: med.customDuration.value, unit: med.customDuration.unit }
+                custom: med?.custom, customDosage:med?.customDosage,
+                customFrequency: { value: med?.customFrequency?.value, unit: med?.customFrequency?.unit },
+                customDuration: { value: med?.customDuration?.value, unit: med?.customDuration?.unit }
               })) : [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "", remove: false, current: true,custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' } }],
           newMedications: [{ nameOfDrugs: "", id: "", quantity: 1, startDate: "", endDate: "",custom: false, customDosage: "", customFrequency: { value: '', unit: 'hours' }, customDuration: { value: '', unit: 'days' }}],
         });
 
-        const medicationResponse = await api.get(`https://medical-api-advo.onrender.com/api/medication/${hospitalIdFromLocalStorage}/medications`);
-        setMedicationsData(medicationResponse.data);
+        const medicationResponse = await api.get(`https://medical-api-advo.onrender.com/api/medication/${hospitalIdFromLocalStorage}/medications`)
+        .then((medicationResponse)=>{
+          setMedicationsData(medicationResponse.data);
+        }).catch((error)=>console.log(error))
+        // setMedicationsData(medicationResponse.data);
+        console.log(medicationsData)
       } catch (error) {
         console.error("Error fetching user or medications:", error);
       } finally {
@@ -202,68 +207,90 @@ export default function EditUser() {
     });
   };
   
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-  
-    try {
-      // Handle regular medications
-      const medicationsPayload = formData.medications.map((medication) => ({
-        medication: medication.id,
-        quantity: Number(medication.quantity),
-        startDate: medication.startDate,
-        endDate: medication.endDate,
-        current: medication.current,
-        remove: medication.remove || false,
-        custom: medication.custom, // Pass the custom flag
-        customDosage: medication.custom ? medication.customDosage : undefined,
-        customFrequency: medication.custom ? medication.customFrequency : undefined,
-        customDuration: medication.custom ? medication.customDuration : undefined,
-      }));
-  
-      // Handle new medications
-      const newMedicationsPayload = formData.newMedications
-        .filter((med) => med.id) // Only include medications with an ID
-        .map((medication) => ({
-          medication: medication.id,
-          quantity: Number(medication.quantity) || 1,
-          startDate: medication.startDate || Date.now(),
-          endDate: medication.endDate,
-          current: true,
-          remove: medication.remove || false,
-          custom: medication.custom, // Pass the custom flag
-          customDosage: medication.custom ? medication.customDosage : undefined,
-          customFrequency: medication.custom ? medication.customFrequency : undefined,
-          customDuration: medication.custom ? medication.customDuration : undefined,
-        }));
-  
-      console.log('Medications Payload:', medicationsPayload);
-      console.log('New Medications Payload:', newMedicationsPayload);
-  
-      // Send PUT request with both medications and newMedications
-      const response = await api.put(`https://medical-api-advo.onrender.com/api/user/hospital/${hospitalId}/users/${userId}`, {
-        fullName: formData.fullName,
-        dateOfBirth: formData.dateOfBirth,
-        gender: formData.gender,
-        phoneNumber: formData.phoneNumber,
-        email: formData.email,
-        medications: medicationsPayload,
-        newMedications: newMedicationsPayload,
-      });
-  
-      console.log('Response:', response);
-  
-      if (response.status === 200) {
-        router.push("/dashboard/user");
-      }
-    } catch (error) {
-      console.error("Error updating user:", error);
-    } finally {
-      setSubmitting(false);
+
+    // Validation for custom fields
+    const validateCustomFields = (medication) => {
+        if (medication.custom) {
+            return medication.customDosage && medication.customFrequency?.value && medication.customDuration?.value;
+        }
+        return true;
+    };
+
+    // Validate medications and new medications
+    const areMedicationsValid = formData.medications.every(validateCustomFields);
+    const areNewMedicationsValid = formData.newMedications.every(validateCustomFields);
+
+    if (!areMedicationsValid || !areNewMedicationsValid) {
+        alert("Please fill in all required custom fields.");
+        setSubmitting(false);
+        return;
     }
-  };
-  
+
+    try {
+        // Prepare payload for regular medications
+        const medicationsPayload = formData.medications.map((med) => ({
+            _id:med._id,
+            medication: med.id,
+            quantity: Number(med.quantity),
+            startDate: med.startDate,
+            endDate: med.endDate,
+            current: med.current,
+            remove: med.remove || false,
+            custom: med.custom,
+            customDosage: med.custom ? med.customDosage : undefined,
+            customFrequency: med.custom ? med.customFrequency : undefined,
+            customDuration: med.custom ? med.customDuration : undefined,
+        }));
+
+        // Prepare payload for new medications
+        const newMedicationsPayload = formData.newMedications
+            .filter((med) => med.id) // Include only medications with an ID
+            .map((med) => ({
+                medication: med.id,
+                quantity: Number(med.quantity) || 1,
+                startDate: med.startDate || new Date().toISOString(),
+                endDate: med.endDate,
+                current: med.current !== undefined ? med.current : true,
+                custom: med.custom,
+                customDosage: med.custom ? med.customDosage : undefined,
+                customFrequency: med.custom ? med.customFrequency : undefined,
+                customDuration: med.custom ? med.customDuration : undefined,
+            }));
+
+        console.log('Medications Payload:', medicationsPayload);
+        console.log('New Medications Payload:', newMedicationsPayload);
+
+        // Send PUT request with medications data
+        const response = await api.put(
+            `https://medical-api-advo.onrender.com/api/user/hospital/${hospitalId}/users/${userId}`,
+            {
+                fullName: formData.fullName,
+                dateOfBirth: formData.dateOfBirth,
+                gender: formData.gender,
+                phoneNumber: formData.phoneNumber,
+                email: formData.email,
+                medications: medicationsPayload,
+                newMedications: newMedicationsPayload,
+            }
+        );
+
+        console.log('Response:', response);
+
+        if (response.status === 200) {
+            router.push("/dashboard/user");
+        }
+    } catch (error) {
+        console.error("Error updating user:", error);
+    } finally {
+        setSubmitting(false);
+    }
+};
+
+// console.log(formData.medications)
+
   return (
     <main className="flex-1 overflow-auto p-6">
       <div className="grid gap-6">
@@ -334,6 +361,7 @@ export default function EditUser() {
                            <h2>User Does Not have any Medication</h2>
                           :
                           formData.medications.filter((medication)=>medication.current === true).map((medication, index) => (
+                            
                             <>
                               <Card key={index} className={medication.remove ? "border-red-500" : ""}>
                                 <CardHeader>
