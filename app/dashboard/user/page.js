@@ -86,6 +86,25 @@ export default function UserDashboard() {
                         <Button variant="outline">View Users with Regimen</Button>
                     </CardFooter>
                 </Card>
+
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle>Add New user</CardTitle>
+                        <CardDescription>
+                        
+                        {/* <span className="text-muted-foreground">Add a New User</span> */}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Link  href="/dashboard/user/create">
+                        
+                        <Button variant="outline" className="flex items-center justify-center gap-x-2">
+                            <span className="text-2xl font-bold">+</span>     
+                              Add User
+                        </Button>
+                        </Link>
+                    </CardFooter>
+                </Card>
             </div>
 
             {/* Recently Registered Users and User Table */}

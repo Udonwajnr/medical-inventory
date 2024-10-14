@@ -436,7 +436,7 @@ export default function CreateUser() {
       <Button
         type="button"
         onClick={() => handleRemoveMedication(index)}
-        className="bg-red-500 text-white rounded-md p-2 mt-4 hover:bg-red-600"
+        className="inline-block bg-red-500 text-white rounded-md p-2 mt-4 hover:bg-red-600"
       >
         Remove
       </Button>
@@ -447,13 +447,14 @@ export default function CreateUser() {
           <Button
             type="button"
             onClick={handleAddMedication}
-            className=" text-white rounded-md p-2 hover:bg-blue-600"
+            className=" text-white rounded-md p-2 max-w-44"
           >
-            Add Medication
+            {formData.medications.length>0 ?"Add Another Medication":"Add Medication"}
+            
           </Button>
           </div>
 
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} className="mt-10">
                 {loading ? "Creating..." : "Create User"}
               </Button>
             </form>
