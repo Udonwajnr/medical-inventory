@@ -30,6 +30,8 @@ export default function UserDashboard() {
     fetchUsers();
   }, []);
 
+  console.log(hospital.users)
+
   return (
     <>
     <div>
@@ -40,7 +42,7 @@ export default function UserDashboard() {
                     <CardHeader className="pb-3">
                         <CardTitle>Total Users</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">{hospital?.users?.length || 0}</span>
+                            <span className="text-4xl font-bold">{hospital?.users?.length || 0} </span>
                             <span className="text-muted-foreground">Total Users</span>
                         </CardDescription>
                     </CardHeader>
@@ -66,7 +68,9 @@ export default function UserDashboard() {
                     <CardHeader className="pb-3">
                         <CardTitle>Users with Medications</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">{hospital?.users?.[0]?.medications?.length || 0}</span>
+                            <span className="text-4xl font-bold">{hospital?.users?.filter(user => 
+                                user?.medications?.some(medication => medication?.current === true)
+                            ).length || 0}</span>
                             <span className="text-muted-foreground">Users currently on medication</span>
                         </CardDescription>
                     </CardHeader>
@@ -78,7 +82,11 @@ export default function UserDashboard() {
                     <CardHeader className="pb-3">
                         <CardTitle>Users with Custom Medications Regimen</CardTitle>
                         <CardDescription>
-                            <span className="text-4xl font-bold">{hospital?.userSpecificMedicationRegimen?.length||0}</span>
+                            <span className="text-4xl font-bold">
+                            {hospital?.users?.filter(user => 
+                                user?.medications?.some(medication => medication?.custom === true)
+                            ).length}
+                            </span>
                             <span className="text-muted-foreground">Total Users with Custom Medications Regimen</span>
                         </CardDescription>
                     </CardHeader>
