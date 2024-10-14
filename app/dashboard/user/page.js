@@ -142,7 +142,9 @@ export default function UserDashboard() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="outline">View All Users</Button>
+                        <Link href={`/dashboard/user/table`}>
+                            <Button variant="outline">View All Users</Button>
+                        </Link>
                     </CardFooter>
                 </Card>
                 {/* User Table Component */}

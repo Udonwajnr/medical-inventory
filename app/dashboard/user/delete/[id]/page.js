@@ -92,7 +92,7 @@ export default function UserDeleteConfirmation() {
           >
             {isDeleting ? "Deleting..." : "Confirm Delete"}
           </Button>
-          <Link href="/dashboard/inventory">
+          <Link href="/dashboard/user">
             <Button variant="outline" disabled={isDeleting}>
               Cancel
             </Button>

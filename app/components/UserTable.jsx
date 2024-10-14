@@ -18,6 +18,7 @@ export default function UserTable() {
   const [sortDirection, setSortDirection] = useState("asc")
   const [users, setUsers] = useState([])
   const [hospitalId, setHospitalId] = useState(null)
+  
   useEffect(() => {
     const fetchHospitalId = () => {
       const id = localStorage.getItem("_id")
