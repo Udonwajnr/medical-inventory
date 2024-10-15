@@ -7,6 +7,7 @@ import { BarChart, Users, Package, DollarSign } from 'lucide-react' // Assuming 
 import { useAuth } from '../auth/auth-context'
 import { AuthProvider } from '../auth/auth-context'
 import { useContext } from 'react'
+import { ThemeProvider } from '../components/theme-provider'
 
 export default function DashBoardHome() {
   const {hospitalData} = useAuth()
