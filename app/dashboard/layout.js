@@ -13,6 +13,5 @@ export default function DashboardLayout({
                     <Toaster  richColors/>
                 </ContainerLayout>
             </AuthProvider>
-
     )
   }

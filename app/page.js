@@ -15,9 +15,14 @@ import { Menu } from 'lucide-react';
 import axios from "axios";
 
 export default function InventoryLandingPage() {
+  const [active,setActive] = useState(null)
+  const [fakeError,setFakeError] = useState(null)
   useEffect(()=>{
-     axios.get('https://medical-api-advo.onrender.com')
-     .then((data)=>console.log("ready")).catch((err)=>console.log(err))
+    const accessToken = localStorage.getItem('accessToken');
+     setActive(accessToken) 
+    axios.get('https://medical-api-advo.onrender.com')
+     .then((data)=>console.log("welcome"))
+     .catch((err)=>console.log(""))
   },[])
   return (
     <>
@@ -34,12 +39,23 @@ export default function InventoryLandingPage() {
             {/* <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
               About
             </Link> */}
-            <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-              Login
-            </Link>
-            <Link href="/register" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-              Register
-            </Link>
+            {
+              !active? 
+              <>
+                <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Login
+                </Link>
+                <Link href="/register" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Register
+                </Link>  
+              </>
+              :
+              <>
+                <Link href={"/dashboard"} className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Go To dashboard
+                </Link>
+              </>
+            }
           </nav>
           <div className="ml-auto sm:hidden">
             <Sheet>
@@ -55,15 +71,23 @@ export default function InventoryLandingPage() {
                   <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
                     Home
                   </Link>
-                  {/* <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
-                    About
-                  </Link> */}
-                  <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
-                    Login
-                  </Link>
-                  <Link href="/register" className="text-sm font-medium hover:underline underline-offset-4">
-                    Register
-                  </Link>
+                  {
+              !active? 
+              <>
+                <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Login
+                </Link>
+                <Link href="/register" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Register
+                </Link>  
+              </>
+              :
+              <>
+                <Link href={"/dashboard"} className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+                  Go To dashboard
+                </Link>
+              </>
+            }
                 </nav>
               </SheetContent>
             </Sheet>
