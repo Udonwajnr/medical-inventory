@@ -67,7 +67,7 @@ export default function ContainerLayout({children}){
           <TooltipContent side="right">Inventory</TooltipContent>
         </Tooltip>
 
-        <Tooltip>
+        {/* <Tooltip>
           <TooltipTrigger asChild>
             <Link
               href="/dashboard/orders"
@@ -81,7 +81,7 @@ export default function ContainerLayout({children}){
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right">Orders</TooltipContent>
-        </Tooltip>
+        </Tooltip> */}
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -105,7 +105,7 @@ export default function ContainerLayout({children}){
                 <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                    <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
+                    <Link href="/dashboard/settings" className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
                         <SettingsIcon className="h-5 w-5" />
                         <span className="sr-only">Settings</span>
                     </Link>
@@ -145,31 +145,31 @@ export default function ContainerLayout({children}){
                         <PillIcon className="h-5 w-5 transition-all group-hover:scale-110" />
                         <span className="sr-only">Tuky's Pharma</span>
                     </Link>
-                    <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                    <Link href="/dashboard" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
                         <MdiDesktopMacDashboard className="h-5 w-5" />
                         Dashboard
                     </Link>
-                    <Link href="#" className="flex items-center gap-4 px-2.5 text-foreground" prefetch={false}>
+                    <Link href="/dashboard/inventory" className="flex items-center gap-4 px-2.5 text-foreground" prefetch={false}>
                         <WarehouseIcon className="h-5 w-5" />
                         Inventory
                     </Link>
-                    <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                    <Link href="/dashboard/user" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
                         <MdiAccount className="h-5 w-5" />
                         Users
                     </Link>
-                    <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                    {/* <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
                         <ShoppingBasketIcon className="h-5 w-5" />
                         Suppliers
                     </Link>
                     <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
                         <FilesIcon className="h-5 w-5" />
                         Reports
-                    </Link>
-                    <Link href="#" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                    </Link> */}
+                    <Link href="/dashboard/settings" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
                         <SettingsIcon className="h-5 w-5" />
                         Settings
                     </Link>
-                    <button  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false}>
+                    <button className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground" prefetch={false} onClick={logout}>
                         <LogOut className="h-5 w-5" />
                         Logout
                     </button>
