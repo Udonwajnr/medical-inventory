@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../axios/axiosConfig'; // Use your Axios instance
-
+import { toast } from 'sonner';
 // Create a Context with default values
 const AuthContext = createContext();
 
@@ -72,17 +72,20 @@ const AuthContext = createContext();
     // };
 
     const logout = async () => {
-        // try {
-        //     // Optionally notify the server about logout here
-        //     await api.post('/api/auth/logout');
-        // } catch (error) {
-        //     console.error('Logout failed:', error);
-        // }
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem("_id")
-        setIsAuthenticated(false);
-        setHospitalData(null); // Clear hospital data on logout
-        router.push('/login');
+        try {
+            // Optionally notify the server about logout here
+            await api.post('https://medical-api-advo.onrender.com/api/hospital/logout')
+            .then((data)=>{
+                console.log(data)
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem("_id")
+                setIsAuthenticated(false);
+                setHospitalData(null); // Clear hospital data on logout
+                router.push('/login');
+            })
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
     };
 
     return (

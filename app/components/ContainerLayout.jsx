@@ -119,7 +119,7 @@ export default function ContainerLayout({children}){
                 <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                    <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" prefetch={false}>
+                    <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8" >
                         <LogOut className="h-5 w-5" />
                         <span className="sr-only">Logout</span>
                     </button>
@@ -184,7 +184,6 @@ export default function ContainerLayout({children}){
                 <form onSubmit={handleSubmit}>
                     <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input type="search" placeholder="Search inventory or users ..." className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]" />
-                
                 </form>
                 </div>
             
